@@ -10,7 +10,7 @@ var layerTypes = {
   fill: ["fill-opacity"],
   line: ["line-opacity"],
   circle: ["circle-opacity", "circle-stroke-opacity"],
-  symbol: ["icon-opacity", "text-opacity"],  // Make sure "text-opacity" is here
+  symbol: ["icon-opacity", "text-opacity"],
   raster: ["raster-opacity"],
   "fill-extrusion": ["fill-extrusion-opacity"],
   heatmap: ["heatmap-opacity"],
@@ -89,55 +89,17 @@ function hideMap() {
   document.getElementById('map').classList.remove('visible');
 }
 
-// // Modify the onStepEnterWithTimeline function in your map.js file
-// // Find this function in your code and add the map visibility control:
-// function onStepEnterWithTimeline(response) {
-//   // Update the current chapter ID
-//   currentChapterId = response.element.id;
-  
-//   var chapter = config.chapters.find(
-//     (chap) => chap.id === response.element.id
-//   );
+// Function to show the Justice40 map - will be called from chapter callbacks
+function showJustice40Map() {
+  // Implementation would go here
+  console.log("Showing Justice40 map");
+}
 
-//   response.element.classList.add("active");
-  
-//   // Move the map even if it's hidden (so it's in the right position when shown)
-//   map[chapter.mapAnimation || "flyTo"](chapter.location);
-
-//   if (config.showMarkers) {
-//     marker.setLngLat(chapter.location.center);
-//   }
-  
-//   // Handle map visibility based on chapter ID
-//   // Based on your config, "DAC3" appears to be your 5th actual chapter
-//   // Adjust this condition if a different chapter should show the map
-//   if (currentChapterId === "DAC3" || 
-//       currentChapterId === "DAC4" || 
-//       currentChapterId === "DAC5" || 
-//       currentChapterId === "DAC6" || 
-//       currentChapterId === "DAC10") {
-//     showMap();
-//   } else {
-//     hideMap();
-//   }
-  
-//   if (chapter.onChapterEnter.length > 0) {
-//     chapter.onChapterEnter.forEach(setLayerOpacity);
-//   }
-  
-//   // Call the chapter callback
-//   if (chapter.callback) {
-//     if (chapter.callback === 'showTimelineGraph') { 
-//       showTimelineGraph(); 
-//     } else if (chapter.callback === 'showMap') {
-//       showMap();
-//     } else if (chapter.callback === 'hideMap') {
-//       hideMap();
-//     } else { 
-//       window[chapter.callback](); 
-//     }
-//   }
-// }
+// Function to hide the Justice40 map
+function hideJustice40Map() {
+  // Implementation would go here
+  console.log("Hiding Justice40 map");
+}
 
 // Create the timeline graph container that will overlay on the map
 function createTimelineGraph() {
@@ -162,13 +124,13 @@ function createTimelineGraph() {
     // Create the content div
     const contentDiv = document.createElement('div');
     contentDiv.id = 'graph-content';
-    // contentDiv.style.width = '90%';
-    // contentDiv.style.height = '80vh';
-    // contentDiv.style.margin = '10vh auto 0';
-    // contentDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.85)';
-    // contentDiv.style.borderRadius = '10px';
-    // contentDiv.style.padding = '20px';
-    // contentDiv.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
+    contentDiv.style.width = '90%';
+    contentDiv.style.height = '80vh';
+    contentDiv.style.margin = '10vh auto 0';
+    contentDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.85)';
+    contentDiv.style.borderRadius = '10px';
+    contentDiv.style.padding = '20px';
+    contentDiv.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
     
     // Create a title element
     const titleElement = document.createElement('h2');
@@ -526,6 +488,63 @@ function hideTimelineGraph() {
   }
 }
 
+// Add the cloudburst transition functions
+function fadeInCloudburstImage() {
+  console.log("Fading in cloudburst image");
+  const overlay = document.getElementById('cloudburstOverlay');
+  if (overlay) {
+    overlay.style.opacity = "1";
+  }
+}
+
+function fadeOutCloudburstImage() {
+  console.log("Fading out cloudburst image");
+  const overlay = document.getElementById('cloudburstOverlay');
+  if (overlay) {
+    overlay.style.opacity = "0";
+  }
+}
+
+// Add the Queens video playback function
+function setupQueensVideoPlayback() {
+  // Get the chapter element
+  const videoChapter = document.getElementById("QUEENS_VIDEO");
+  
+  // Add an intersection observer to detect when the video chapter is visible
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const videoElement = document.getElementById("queensVideo");
+      if (!videoElement) return;
+      
+      if (entry.isIntersecting) {
+        // Play the video when chapter becomes visible
+        videoElement.play().catch(e => console.error("Video play error:", e));
+      } else {
+        // Optionally pause the video when not visible
+        // videoElement.pause();
+      }
+    });
+  }, { threshold: 0.3 }); // Trigger when 30% of the element is visible
+  
+  // Start observing the video chapter when it exists in the DOM
+  if (videoChapter) {
+    observer.observe(videoChapter);
+  } else {
+    // If the chapter doesn't exist yet, check again after a short delay
+    setTimeout(() => {
+      const videoChapterDelayed = document.getElementById("QUEENS_VIDEO");
+      if (videoChapterDelayed) {
+        observer.observe(videoChapterDelayed);
+      }
+    }, 2000);
+  }
+}
+
+/* Here we add the two extra layers we are using, just like in our previous
+tutorial. At the end, however, we setup the functions that will tie the
+scrolling to the chapters and move the map from one location to another
+while changing the zoom level, pitch and bearing */
+
 /* Next, these variables and functions create the story and vignette html
 elements, and populate them with the content from the config.js file.
 They also assign a css class to certain elements, also based on the
@@ -649,9 +668,6 @@ if (config.showMarkers) {
   marker.setLngLat(config.chapters[0].location.center).addTo(map);
 }
 
-// Add this code to your map.js file inside the map.on("load", function() {...}) callback
-// Right after your layer definitions but before the scrollama setup
-
 // Function to create random points within a bounding box, avoiding the center
 function createRandomPointsAroundEdges(centerLng, centerLat, count, outerRadiusKm, innerRadiusKm) {
   const points = [];
@@ -683,88 +699,9 @@ function createRandomPointsAroundEdges(centerLng, centerLat, count, outerRadiusK
   return points;
 }
 
-// // Add image markers once at load time
-// function addStaticImageMarkers() {
-//   console.log("Adding static image markers to the map");
-  
-//   // Generate random points around the area of interest, avoiding the center
-//   // Parameters: center longitude, center latitude, number of points, outer radius (km), inner radius (km)
-//   const randomImagePoints = createRandomPointsAroundEdges(-73.856, 40.757, 8, 0.5, 0.1);
-  
-//   // Load all 4 images first
-//   const imagePromises = [1, 2, 3, 4].map(id => {
-//     return new Promise((resolve, reject) => {
-//       map.loadImage(`Images/${id}`, (error, image) => {
-//         if (error) {
-//           console.error(`Failed to load image Images/${id}:`, error);
-//           reject(error);
-//           return;
-//         }
-        
-//         // Add the image to the map
-//         const imageKey = `marker-image-${id}`;
-//         if (!map.hasImage(imageKey)) {
-//           map.addImage(imageKey, image);
-//         }
-//         resolve();
-//       });
-//     });
-//   });
-  
-//   // After all images are loaded, add the markers
-//   Promise.all(imagePromises).then(() => {
-//     // Create a single source with all points
-//     const features = randomImagePoints.map((point, index) => {
-//       return {
-//         type: 'Feature',
-//         geometry: {
-//           type: 'Point',
-//           coordinates: [point.lng, point.lat]
-//         },
-//         properties: {
-//           id: index,
-//           imageId: point.imgId,
-//           // Random size between 30 and 80 pixels
-//           size: Math.floor(Math.random() * 50) + 30
-//         }
-//       };
-//     });
-    
-//     // Add a single source for all markers
-//     map.addSource('311-image-markers', {
-//       type: 'geojson',
-//       data: {
-//         type: 'FeatureCollection',
-//         features: features
-//       }
-//     });
-    
-//     // Add a symbol layer for all the markers
-//     map.addLayer({
-//       id: '311-image-markers-layer',
-//       type: 'symbol',
-//       source: '311-image-markers',
-//       layout: {
-//         'icon-image': ['concat', 'marker-image-', ['get', 'imageId']],
-//         'icon-size': ['/', ['get', 'size'], 100], // Normalize size
-//         'icon-allow-overlap': true
-//       },
-//       paint: {
-//         'icon-opacity': 0 // Start hidden, will be shown on chapter enter
-//       }
-//     });
-    
-//     console.log('Static image markers added successfully');
-//   }).catch(error => {
-//     console.error('Error adding static image markers:', error);
-//   });
-// }
-
-// // Call the function to add the static image markers
-// addStaticImageMarkers();
-
 // instantiate the scrollama
 var scroller = scrollama();
+
 
 /* Here we add the two extra layers we are using, just like in our previous
 tutorial. At the end, however, we setup the functions that will tie the
@@ -792,391 +729,318 @@ map.on("load", function () {
       },
     });
   }
-  // map.addLayer(
-  //   {
-  //     id: "DAC",
-  //     type: "fill",
-  //     source: {
-  //       type: "geojson",
-  //       data: "",
-  //     },
-  //     paint: {
-  //       "fill-opacity": 0,
-  //       "fill-color": 'blue',
-  //     },
-  //   },
-  // );
 
-// 311 DATA 
-map.addLayer({
-  'id': '311',  // This ID should match what you use in the chapter config
-  'type': 'circle',
-  'source': {
-    'type': 'geojson',
-    'data': 'data/Flooding.geojson'
-  },
-  'paint': {
-    'circle-color': '#00ffea',
-    'circle-opacity': 0,  // Start invisible
-    'circle-radius': [
-      'interpolate', ['linear'], ['zoom'],
-      10, 1,
-      15, 6
-    ]
-  }
-});
-
-// 311 DATA LABELS 
-map.addLayer({
-  'id': '311-labels',  // This ID should match what you use in the chapter config
-  'type': 'symbol',
-  'source': {
-    'type': 'geojson',
-    'data': 'data/Flooding.geojson'
-  },
-  'layout': {
-    'text-field': 'Complaint: Street Flooding',
-    'text-size': 12,
-    'text-offset': [0, -1.5],
-    'text-anchor': 'bottom',
-    'text-max-width': 8,
-    'text-allow-overlap': false,
-    'text-ignore-placement': false
-  },
-  'paint': {
-    'text-color': '#000000',
-    'text-halo-color': '#ffffff',
-    'text-halo-width': 1,
-    'text-opacity': 0  // Start invisible
-  },
-  'minzoom': 13
-});
-
-// STREET LEVEL FLOODING DATA 
-map.addLayer({
-  'id': 'all-flooding',
-  'type': 'fill',
-  'source': {
-    'type': 'geojson',
-    'data': 'Data/Clipped gs.geojson'
-  },
-  'paint': {
-    'fill-color': '#00ffea',
-    'fill-opacity': 0.7
-  }
-  // No filter applied - will show all geometry types
-});
-map.addLayer({
-  'id': 'all-flooding-outline',
-  'type': 'line',
-  'source': {
-    'type': 'geojson',
-    'data': 'Data/Clipped gs.geojson'
-  },
-  'paint': {
-    'line-color': '#000',
-    'line-width': 1,
-    'line-opacity': 0.8
-  }
-});
-
-// FEMA
-map.addLayer({
-  'id': 'Fema-flooding',
-  'type': 'fill',
-  'source': {
-    'type': 'geojson',
-    'data': 'Data/Fema.geojson'
-  },
-  'paint': {
-    'fill-color': '#00ffea',
-    'fill-opacity': 0.7
-  }
-  // No filter applied - will show all geometry types
-});
-
-
-
-
-// // FEMA
-// map.addLayer({
-//   'id': 'Fema_Flooding',
-//   'type': 'fill',
-//   'source': {
-//     'type': 'geojson',
-//     'data': 'Data/Fema.geojson'
-//   },
-//   'paint': {
-//     'fill-color': '#00ffea',
-//     'fill-opacity': 'blue',
-//   }
-//   // No filter applied - will show all geometry types
-// });
-
-
-
-map.addLayer({
-  id: "redline",
-  type: "fill",
-  source: {
-    type: "geojson",
-    data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
-  },
-  paint: {
-    "fill-opacity": 0.8,
-    "fill-color": [
-      "step",
-      ["get", "Redline"],
-      "rgba(0, 0, 0, 0)",  // transparent for lower values
-      60, "#bc8f8f",     // rosy brown for values 60-79.9
-      80, "#8b4513",     // saddle brown for values 80-89.9
-      90, "#5c3317"      // very dark brown for values 90-100
-    ]
-  }
-}, 'water');
-
-// Combined Race/Ethnicity Layer
-map.addLayer({
-  id: "race-ethnicity",
-  type: "fill",
-  source: {
-    type: "geojson",
-    data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
-  },
-  paint: {
-    "fill-opacity": 0.8,
-    "fill-color": [
-      "case",
-      // Asian predominant
-      [">", ["get", "Asian_Pct"], 
-        ["max", ["get", "Black_Pct"], ["get", "Lat_Pct"]]
-      ],
-      [
-        "step",
-        ["get", "Asian_Pct"],
-        "#e0ecf4", // light blue - lower percentage
-        50, "#9ebcda",
-        75, "#8c96c6",
-        90, "#8856a7"  // purple - highest percentage
-      ],
-      
-      // Black predominant
-      [">", ["get", "Black_Pct"], ["get", "Lat_Pct"]],
-      [
-        "step",
-        ["get", "Black_Pct"],
-        "#fee6ce", // light orange - lower percentage
-        50, "#fdae6b",
-        75, "#fd8d3c",
-        90, "#e6550d"  // dark orange - highest percentage
-      ],
-      
-      // Latino predominant (default)
-      [
-        "step",
-        ["get", "Lat_Pct"],
-        "#e5f5e0", // light green - lower percentage
-        50, "#a1d99b",
-        75, "#74c476",
-        90, "#41ab5d"  // dark green - highest percentage
+  // 311 DATA 
+  map.addLayer({
+    'id': '311',  // This ID should match what you use in the chapter config
+    'type': 'circle',
+    'source': {
+      'type': 'geojson',
+      'data': 'data/Flooding.geojson'
+    },
+    'paint': {
+      'circle-color': '#00ffea',
+      'circle-opacity': 0,  // Start invisible
+      'circle-radius': [
+        'interpolate', ['linear'], ['zoom'],
+        10, 1,
+        15, 6
       ]
-    ]
-  }
-}, 'water');
+    }
+  });
 
-// redline
-map.addLayer(
-  {
-    id: "DAC5",
+  // 311 DATA LABELS 
+  map.addLayer({
+    'id': '311-labels',  // This ID should match what you use in the chapter config
+    'type': 'symbol',
+    'source': {
+      'type': 'geojson',
+      'data': 'data/Flooding.geojson'
+    },
+    'layout': {
+      'text-field': 'Complaint: Street Flooding',
+      'text-size': 12,
+      'text-offset': [0, -1.5],
+      'text-anchor': 'bottom',
+      'text-max-width': 8,
+      'text-allow-overlap': false,
+      'text-ignore-placement': false
+    },
+    'paint': {
+      'text-color': '#000000',
+      'text-halo-color': '#ffffff',
+      'text-halo-width': 1,
+      'text-opacity': 0  // Start invisible
+    },
+    'minzoom': 13
+  });
+
+  // STREET LEVEL FLOODING DATA 
+  map.addLayer({
+    'id': 'all-flooding',
+    'type': 'fill',
+    'source': {
+      'type': 'geojson',
+      'data': 'Data/Clipped gs.geojson'
+    },
+    'paint': {
+      'fill-color': '#00ffea',
+      'fill-opacity': 0  // Start invisible
+    }
+  });
+  
+  map.addLayer({
+    'id': 'all-flooding-outline',
+    'type': 'line',
+    'source': {
+      'type': 'geojson',
+      'data': 'Data/Clipped gs.geojson'
+    },
+    'paint': {
+      'line-color': '#000',
+      'line-width': 1,
+      'line-opacity': 0  // Start invisible
+    }
+  });
+
+  // FEMA FLOODING DATA
+  map.addLayer({
+    'id': 'Fema-flooding',
+    'type': 'fill',
+    'source': {
+      'type': 'geojson',
+      'data': 'Data/Fema.geojson'
+    },
+    'paint': {
+      'fill-color': '#00ffea',
+      'fill-opacity': 0  // Start invisible
+    }
+  });
+  
+  map.addLayer({
+    'id': 'Fema-flooding-outline',
+    'type': 'line',
+    'source': {
+      'type': 'geojson',
+      'data': 'Data/Fema.geojson'
+    },
+    'paint': {
+      'line-color': '#000',
+      'line-width': 1,
+      'line-opacity': 0  // Start invisible
+    }
+  });
+
+  // REDLINE
+  map.addLayer({
+    id: "redline",
     type: "fill",
     source: {
       type: "geojson",
-      data: "Data/Potential_Environmental_Justice_Area__PEJA.geojson",
+      data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
     },
     paint: {
-      "fill-opacity": 0,
+      "fill-opacity": 0,  // Start invisible
       "fill-color": [
         "step",
-        ["get", "BPOVRATE"],
-        "#fefae0",  // very light brown (0–10%)
-        10,  "#f5deb3",  // wheat
-        20,  "#deb887",  // burlywood
-        40,  "#d2b48c",  // tan
-        60,  "#bc8f8f",  // rosy brown
-        80,  "#8b4513",  // saddle brown
-        90,  "#5c3317"   // very dark brown
-      ],
+        ["get", "Redline"],
+        "rgba(0, 0, 0, 0)",  // transparent for lower values
+        60, "#bc8f8f",     // rosy brown for values 60-79.9
+        80, "#8b4513",     // saddle brown for values 80-89.9
+        90, "#5c3317"      // very dark brown for values 90-100
+      ]
+    }
+  }, 'water');
+
+  // Combined Race/Ethnicity Layer
+  map.addLayer({
+    id: "race-ethnicity",
+    type: "fill",
+    source: {
+      type: "geojson",
+      data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
     },
-  },
-); 
+    paint: {
+      "fill-opacity": 0,  // Start invisible
+      "fill-color": [
+        "case",
+        // Asian predominant
+        [">", ["get", "Asian_Pct"], 
+          ["max", ["get", "Black_Pct"], ["get", "Lat_Pct"]]
+        ],
+        [
+          "step",
+          ["get", "Asian_Pct"],
+          "#e0ecf4", // light blue - lower percentage
+          50, "#9ebcda",
+          75, "#8c96c6",
+          90, "#8856a7"  // purple - highest percentage
+        ],
+        
+        // Black predominant
+        [">", ["get", "Black_Pct"], ["get", "Lat_Pct"]],
+        [
+          "step",
+          ["get", "Black_Pct"],
+          "#fee6ce", // light orange - lower percentage
+          50, "#fdae6b",
+          75, "#fd8d3c",
+          90, "#e6550d"  // dark orange - highest percentage
+        ],
+        
+        // Latino predominant (default)
+        [
+          "step",
+          ["get", "Lat_Pct"],
+          "#e5f5e0", // light green - lower percentage
+          50, "#a1d99b",
+          75, "#74c476",
+          90, "#41ab5d"  // dark green - highest percentage
+        ]
+      ]
+    }
+  }, 'water');
 
-  // Add Justice40 data using the webmap ID
-// map.js
-// Instead of loading a heavy file, we'll embed the existing map
+  // DISADVANTAGED COMMUNITIES
+  map.addLayer(
+    {
+      id: "DAC",
+      type: "fill",
+      source: {
+        type: "geojson",
+        data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson",
+      },
+      paint: {
+        "fill-opacity": 0,  // Start invisible
+        "fill-color": [
+          "step",
+          ["get", "Comb_Sc"],
+          "#ffffff",
+          85, "#ccedf5",
+          90, "#99daea",
+          95, "#66c7e0",
+          100, "#33b5d5",
+          105, "#00a2ca"
+        ],
+      },
+    }
+  );
+  
+  // LOW AMI
+  map.addLayer(
+    {
+      id: "verylowincome",
+      type: "fill",
+      source: {
+        type: "geojson",
+        data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
+      },
+      paint: {
+        "fill-opacity": 0,  // Start invisible
+        "fill-color": [
+          "step",
+          ["get", "LMI_80_AMI"],
+          "#ffffff",   // < 60: low share of low-income residents
+          60, "#e0ecf4",
+          70, "#9ebcda",
+          80, "#8c96c6",
+          90, "#8856a7",
+          95, "#810f7c"
+        ]
+      }
+    },
+    'water'
+  );
+ // Function to toggle Justice40 map visibility
+ window.toggleJustice40Map = function() {
+  const justice40Visible = document.getElementById('justice40-overlay');
+  if (justice40Visible && justice40Visible.style.opacity === "1") {
+    justice40Visible.style.opacity = "0";
+  } else if (justice40Visible) {
+    justice40Visible.style.opacity = "1";
+  }
+};
 
-map.on('load', function() {
-  // Create a container for the iframe
-  const iframeContainer = document.createElement('div');
-  iframeContainer.style.position = 'absolute';
-  iframeContainer.style.top = '0';
-  iframeContainer.style.left = '0';
-  iframeContainer.style.width = '100%';
-  iframeContainer.style.height = '100%';
-  iframeContainer.style.zIndex = '5'; // Above the base map
-  
-  // Create and add the iframe
-  const iframe = document.createElement('iframe');
-  iframe.src = 'https://edgi-govdata-archiving.github.io/j40-cejst-2/en/#3/38.27/-97.42';
-  iframe.style.width = '100%';
-  iframe.style.height = '100%';
-  iframe.style.border = 'none';
-  
-  iframeContainer.appendChild(iframe);
-  document.getElementById('map').appendChild(iframeContainer);
-  
-  // Hide the iframe container initially
-  iframeContainer.style.display = 'none';
-  
-  // Add a global variable to track the state
-  window.justice40IframeVisible = false;
-  
-  // Add a function to toggle the iframe visibility
-  window.toggleJustice40Map = function() {
-    window.justice40IframeVisible = !window.justice40IframeVisible;
-    iframeContainer.style.display = window.justice40IframeVisible ? 'block' : 'none';
-  };
-});
+// Setup the instance of scrollama
+const scroller = scrollama();
 
-  // Add this before your map code
-map.on('load', function() {
-  console.log('Map loaded');
-  
-  // Check if the GeoJSON data loads
-  fetch('Data/Clipped gs.geojson')
-    .then(response => {
-      console.log('GeoJSON fetch response:', response.status);
-      return response.json();
-    })
-    .then(data => {
-      console.log('GeoJSON data loaded:', data.features.length, 'features found');
-    })
-    .catch(error => {
-      console.error('Error loading GeoJSON:', error);
-    });
-});
-
-  // Create and initialize the timeline graph
-  createTimelineGraph();
-
-  // Define the step entering function
-  function onStepEnterWithTimeline(response) {
-    // Update the current chapter ID
-    currentChapterId = response.element.id;
-    
-    var chapter = config.chapters.find(
+// Setup the scroll functionality
+scroller
+  .setup({
+    step: ".step", // The step class that is defined on each section
+    offset: 0.5, // How far from the top of the viewport to trigger a step
+    debug: false, // Set to true to see the trigger point
+  })
+  .onStepEnter((response) => {
+    // Get the current chapter ID
+    const chapter = config.chapters.find(
       (chap) => chap.id === response.element.id
     );
-
+    currentChapterId = response.element.id;
+    
+    // Update active chapter and story
     response.element.classList.add("active");
-    map[chapter.mapAnimation || "flyTo"](chapter.location);
-
-    if (config.showMarkers) {
-      marker.setLngLat(chapter.location.center);
+    
+    // Fly to the location if animation is flyTo
+    if (chapter.location && chapter.mapAnimation === "flyTo") {
+      map.flyTo({
+        center: chapter.location.center,
+        zoom: chapter.location.zoom,
+        pitch: chapter.location.pitch,
+        bearing: chapter.location.bearing,
+        duration: 1000,
+        essential: true
+      });
     }
     
-    if (chapter.onChapterEnter.length > 0) {
-      chapter.onChapterEnter.forEach(setLayerOpacity);
-    }
-    
-    // Call the chapter callback
+    // Handle chapter-specific callback function
     if (chapter.callback) {
-      if (chapter.callback === 'showTimelineGraph') { 
-        showTimelineGraph(); // This will use currentChapterId internally
-      } else { 
-        window[chapter.callback](); 
-      }
+      window[chapter.callback]();
     }
-  }
-// Add this function to your JavaScript file
-function setupFloodingChapterZoom() {
-  // Get the flooding chapter element
-  const floodingChapter = document.getElementById("flooding311");
-  
-  // Add an intersection observer to detect when this chapter becomes visible
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        // The flooding chapter is now visible, start the zoom animation
-        map.flyTo({
-          center: [-73.856, 40.757],
-          zoom: 20,
-          zoomsmall: 10,
-          pitch: 0,
-          bearing: 0,
-          duration: 5000,  // 5 second zoom animation
-          essential: true
-        });
-        
-        // We only need to observe once, so disconnect
-        observer.disconnect();
-      }
-    });
-  }, { threshold: 0.5 }); // Trigger when 50% of the element is visible
-  
-  // Start observing the flooding chapter
-  observer.observe(floodingChapter);
-}
+    
+    // Handle layer opacity for chapter enter
+    if (chapter.onChapterEnter) {
+      chapter.onChapterEnter.forEach((layer) => {
+        if (layer.transition) {
+          window[layer.transition]();
+        } else if (map.getLayer(layer.layer)) {
+          setLayerOpacity(layer);
+        }
+      });
+    }
+  })
+  .onStepExit((response) => {
+    // Exit only if scrolling forward
+    if (!response.direction === 'down') {
+      return;
+    }
+    
+    // Get the current chapter
+    const chapter = config.chapters.find(
+      (chap) => chap.id === response.element.id
+    );
+    
+    // Update classes
+    response.element.classList.remove("active");
+    
+    // Handle chapter-specific exit callback function
+    if (chapter.exitCallback) {
+      window[chapter.exitCallback]();
+    }
+    
+    // Handle layer opacity for chapter exit
+    if (chapter.onChapterExit) {
+      chapter.onChapterExit.forEach((layer) => {
+        if (layer.transition) {
+          window[layer.transition]();
+        } else if (map.getLayer(layer.layer)) {
+          setLayerOpacity(layer);
+        }
+      });
+    }
+  });
 
-// Call this function after your scrollama setup is complete
-map.on('load', function() {
-  // All your existing map.on('load') code
-  
-  // Then at the very end, add:
-  setupFloodingChapterZoom();
-});
-  map.on('click', '311FloodingData', function(e) {
-  var coordinates = e.features[0].geometry.coordinates.slice();
-  var properties = e.features[0].properties;
-  
-  // Format created_date to be more readable
-  var date = new Date(properties.created_date);
-  var formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-  
-  var description = '<h3>Flooding Report</h3>' +
-                    '<p><strong>Address:</strong> ' + properties.incident_address + '</p>' +
-                    '<p><strong>Created:</strong> ' + formattedDate + '</p>' +
-                    '<p><strong>Status:</strong> ' + properties.status + '</p>' +
-                    '<p><strong>Agency:</strong> ' + properties.agency_name + '</p>';
-  
-  while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-  }
-  
-  new mapboxgl.Popup()
-    .setLngLat(coordinates)
-    .setHTML(description)
-    .addTo(map);
-});
 
-  // setup the scrollama instance
-  scroller
-    .setup({
-      step: ".step",
-      offset: 0.5,
-      progress: true,
-    })
-    .onStepEnter(onStepEnterWithTimeline)
-    .onStepExit((response) => {
-      var chapter = config.chapters.find(
-        (chap) => chap.id === response.element.id
-      );
-      response.element.classList.remove("active");
-      if (chapter.onChapterExit.length > 0) {
-        chapter.onChapterExit.forEach(setLayerOpacity);
-      }
-    });
-
-  if (config.auto) {
-    document.querySelectorAll('[data-scrollama-index="0"]')[0].scrollIntoView();
-  }
+// Setup resize event
+window.addEventListener("resize", scroller.resize);
 });

@@ -12,22 +12,24 @@
   <script src="https://unpkg.com/scrollama"></script>
 </head>
 <body>
-
   <!-- MAP BACKGROUND -->
   <div id="map"></div>
-
+  
   <!-- PERSISTENT GRAPH BACKDROP -->
   <div id="persistent-graph-container">
     <div id="graph-inner"></div>
   </div>
-
+  
   <!-- SCROLLYTELLING CHAPTERS -->
   <div id="story"></div>
-
+  
+  <!-- CLOUDBURST OVERLAY - Just one instance with correct styling -->
+  <div id="cloudburstOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; opacity: 0; transition: opacity 1.5s ease; pointer-events: none;">
+    <img src="Images/Cloudburst Section.png" alt="Cloudburst Section" style="width: 100%; height: 100%; object-fit: cover;">
+  </div>
+  
   <!-- SCRIPTS -->
   <script src="config.js"></script>
   <script src="map.js"></script>
-
-
 </body>
 </html>

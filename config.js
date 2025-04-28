@@ -2,21 +2,58 @@
 let topTitleDiv = "";
 let titleDiv = "";
 let bylineDiv = "";
+// Define footerDiv since it's referenced in the config
+let footerDiv = "";
+
 // Put all content in the descriptionDiv with white text and a more reliable method to display delayed text
 let descriptionDiv =
   '<div class="intro-section" style="position: relative; width: 100vw; height: 100vh; overflow: hidden; margin: 0; padding: 0;">' +
     '<video class="intro-video" autoplay muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;"><source src="images/basement flood.mp4" type="video/mp4">Your browser does not support the video tag.</video>' +
     '<div class="intro-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); z-index: 2;"></div>' +
     '<div id="delayed-text" class="intro-text" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3; text-align: center; max-width: 80%; color: #ffffff;">' +
+      '<h4 style="font-size: 1.2rem; margin-bottom: 0.5rem; font-family: \'Gill Sans\', \'Helvetica\', sans-serif;">Threads | Storytelling with Maps</h4>' +
       '<h1 style="font-size: 3.5rem; margin: 0.5rem 0; font-family: \'Gill Sans\', \'Helvetica\', sans-serif; font-weight: bold; text-transform: uppercase;">WHO IS PAYING THE PRICE FOR FEDERAL CUTS?</h1>' +
       '<p style="font-size: 1.4rem; margin: 1rem 0; font-family: \'Gill Sans\', \'Helvetica\', sans-serif;">Alex, Surya and Nirmohi</p>' +
       '<p style="font-size: 1.4rem; line-height: 1.6; font-family: \'Gill Sans\', \'Helvetica\', sans-serif; margin-top: 2rem;">Explore how disadvantaged communities across New York City are disproportionately affected by federal budget cuts.</p>' +
       '<p style="font-size: 1.2rem; margin-top: 3rem; font-family: \'Gill Sans\', \'Helvetica\', sans-serif;">scroll to begin the journey</p>' +
       '<div style="font-size: 2rem; margin-top: 1rem; animation: bounce 2s infinite;">▼</div>' +
     '</div>' +
-  '</div>' 
+  '</div>' +
+  '<style>' +
+    '@keyframes bounce {' +
+      '0%, 20%, 50%, 80%, 100% { transform: translateY(0); }' +
+      '40% { transform: translateY(-20px); }' +
+      '60% { transform: translateY(-10px); }' +
+    '}' +
+    'body, html { margin: 0 !important; padding: 0 !important; overflow-x: hidden; }' +
+    '#header { margin: 0 !important; padding: 0 !important; }' +
+    '.header { margin: 0 !important; padding: 0 !important; }' +
+    // Add this inline animation for text appearance that doesn't rely on JavaScript execution
+    '#delayed-text { animation: fadeIn 1s ease 5s forwards; opacity: 0; }' +
+    '@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }' +
+  '</style>';
 
-// Create the text content without embedded graph containers
+// 311 DATA ZOOMED OUT
+let divChapter1 = 
+  "<h3>311 COMPLAINTS</h3>" +
+  "<p>311 complaints about flooding in NYC show patterns of street flooding reports across the city, with particular concentration in certain areas of Queens.</p>";
+
+// 311 DATA ZOOMED IN
+let divChapter2 = 
+  "<h3>NYC Flooding Reports</h3>" +
+  "<p>311 reports of street flooding across NYC, zoomed in to show detail in affected neighborhoods.</p>";
+
+// FLOOD STREET LEVEL DATA
+let divChapterFloodingRisk = 
+  "<h3>Flooding Risk Areas</h3>" +
+  "<p>Areas vulnerable to flooding based on flood risk assessment, showing local street-level flood vulnerability in this neighborhood.</p>";
+
+// FEMA FLOOD RISK AREAS
+let divChapterFemaFlooding = 
+  "<h3>FEMA Flood Risk Areas</h3>" +
+  "<p>Areas vulnerable to flooding based on FEMA flood risk assessment, showing broader flood risk zones across the region.</p>";
+
+// FUNDING GRAPH 2022, 2025, 2029 - These already exist in your code, keeping them as is
 let divChapterFunding2022 = 
   "<h3>2022: THE PEAK OF CLIMATE FUNDING</h3>" +
   "<p>In 2022, federal emergency climate funding reached an unprecedented $10.2 billion following the Infrastructure Investment and Jobs Act and IRA implementation, with $3B dedicated to Environmental and Climate Justice Program grants.</p>" +
@@ -32,48 +69,56 @@ let divChapterFunding2029 =
   "<p>Projections show emergency climate funding will remain at just $50 million through 2029 - 99.5% below 2022 levels. With virtually no federal flood protection funding, New York could lose 80,000 homes to flooding in the next 15 years.</p>" +
   "<p>Studies indicate that every $1 invested in disaster prevention saves $6 in recovery costs. These cuts leave Queens neighborhoods particularly vulnerable, as they were among the hardest hit during Hurricane Ida in 2021, when 11 residents lost their lives.</p>";
 
-let footerDiv =
-  '<p>This story is based on data by the <a href="http://web.mta.info/developers/turnstile.html">Metropolitan Transit Authority</a> and reporting by the <a href="https://www.nytimes.com/2020/04/09/nyregion/coronavirus-queens-corona-jackson-heights-elmhurst.html">New York Times</a>, <a href="https://ny.curbed.com/2020/3/24/21192454/coronavirus-nyc-transportation-subway-citi-bike-covid-19">Curbed</a>, and <a href="https://thecity.nyc/2020/03/subway-ridership-plunge-deepest-at-big-manhattan-stations.html">The City</a>.</p>' +
-  '<p><a href="https://www.mapbox.com/about/maps/" target="_blank">© Mapbox</a> | <a href="http://www.openstreetmap.org/about/" target="_blank">© OpenStreetMap</a></p>';
+// EJAREAS CANCELLED
+let divChapterJustice = 
+  "<h3>ENVIRONMENTAL JUSTICE AREAS (EJUSTICE40)</h3>" +
+  '<img src="images/justice 40.png">' + 
+  "<p>Areas vulnerable to extreme flooding based on flood risk assessment, disproportionately affecting environmental justice communities.</p>" +
+  "<p><button onclick='toggleJustice40Map()' style='padding: 10px; background-color: #0078ff; color: white; border: none; border-radius: 5px; cursor: pointer;'>Toggle Justice40 Map</button></p>";
 
-let divChapter1 =
-  "<h3>Flooding data</h3>" 
-  '<p class="imageCredit"><a href="#">Image credit: Your Source Here</a></p>' +
-  "<p>V311 complaints about floodin!</p>";
-
-let divChapter2 =
-  "<h3>POPULATION IN DISADVAATAGED COMMUNITIES </h3>" +
-  '<img src="Images/Justice 40.png">' +
+// REDLINED DISTRICTS
+let divChapter3 = 
+  "<h3>REDLINED AREAS IN THE CITY</h3>" +
   '<p class="imageCredit"><a href="https://www.nytimes.com/2020/04/09/nyregion/coronavirus-queens-corona-jackson-heights-elmhurst.html">The New York Times</a></p>' +
-  "<p>NEW YORK FLOOD HAZARD ZONE</p>";
+  "<p>Historically redlined areas in New York City continue to face disproportionate environmental challenges, including increased flood risk.</p>";
 
-let divChapter3 =
-  "<h3>REDLINED AREAS IN THE CITY </h3>" +
-  '<img src="images/Chapter_3_Image.jpg">' +
-  '<p class="imageCredit"><a href="https://www.nytimes.com/2020/04/09/nyregion/coronavirus-queens-corona-jackson-heights-elmhurst.html">The New York Times</a></p>' +
-  "<p>Elmhurst Hospital Center has been identified as one of the hospitals most overwhelmed by the number of patients with COVID-19 it has received. Located in a low-middle-income area of the city, with a median household income of around $50,000, the hospital serves one of the most diverse and immigrant dense areas of the city. The three subway stations around the hospital have all seen relatively small change in their usage compare to the rest of the city.</p>";
+// ETHNICITY
+let divChapterRaceEthnicity = 
+  "<h3>RACE AND ETHNICITY DISTRIBUTION</h3>" +
+  "<p>This map shows the distribution of predominant racial and ethnic groups across New York State's Disadvantaged Communities, highlighting areas with higher concentrations of Asian, Black, and Latino populations.</p>";
 
-let divChapter4 =
-"<h3>MINORITY COMMUNITIES POPULATION </h3>" +
-'<img src="images/Chapter_3_Image.jpg">' +
-'<p class="imageCredit"><a href="https://www.nytimes.com/2020/04/09/nyregion/coronavirus-queens-corona-jackson-heights-elmhurst.html">The New York Times</a></p>' +
-"<p>Elmhurst Hospital Center has been identified as one of the hospitals most overwhelmed by the number of patients with COVID-19 it has received. Located in a low-middle-income area of the city, with a median household income of around $50,000, the hospital serves one of the most diverse and immigrant dense areas of the city. The three subway stations around the hospital have all seen relatively small change in their usage compare to the rest of the city.</p>";
+// DISADVANTAGED COMMUNITIES POPULATION
+let divChapterDisadvantaged = 
+  "<h3>POPULATION IN DISADVANTAGED COMMUNITIES</h3>" +
+  "<p>This map highlights areas designated as disadvantaged communities, which are disproportionately affected by environmental challenges and federal budget cuts.</p>";
 
-let divChapter4A =
-  "<h3 style='max-width:600px; margin-left:auto; margin-right:auto'>Overall collapse of subway usage</h3>" +
-  '<div style="max-width:1200px; margin-left:auto; margin-right:auto"><img src="images/WeekdaySubway.svg"></div>' +
-  "<p class='imageCredit' style='max-width:600px; margin-left:auto; margin-right:auto'><a href='https://qri.cloud/nyc-transit-data/turnstile_daily_counts_2020'>NYC Subway Turnstile Counts - 2020 (Qri)</a></p>" +
-  "<p style='max-width:600px; margin-left:auto; margin-right:auto'>As can be seen in the chart above, subway usage collapsed abruptly right after the first COVID-19 case was documented in the city. It was in fact the declaration of a state of emergency, on March 7, 2020, that precipitated this near total drop in subway ridership.</p>" +
-  "<p style='max-width:600px; margin-left:auto; margin-right:auto'>After a few weeks of the declaration of state of emergency, subway usage in the city reached its lowest point, almost 90% less than the same time period the year before. Since then, the number of people that use the subway has remained drastically low. Even after the city began its re-opening scheme on June 8, 2020, subway usage was still more than 70% below 2019 levels.</p>" +
-  '<div style="max-width:600px; margin-left:auto; margin-right:auto"><iframe title="vimeo-player" src="https://player.vimeo.com/video/529512696" width="600" height="277.5" frameborder="0" allowfullscreen></iframe></div>' +
-  "<p style='max-width:600px; margin-left:auto; margin-right:auto'>This difference, however, varies across the city, with some parts of it seeing a much steeper decline and others witnessing a stronger recovery. Nevertheless, even a year after the pandemic first hit New York City, the number of daily subway commuters remains below 2019 levels.</p>" +
-  "<p style='max-width:600px; margin-left:auto; margin-right:auto'>That being said, other transportation networks have fared differently. For example, after a similar decline right after the state of emergency was declared, Citibike has seen its number of users reach and even surpass 2019 levels. City buses, on the other hand, also remain underutilized compared to their usage pre-pandemic.</p>";
+// EXTREMELY LOW INCOME POPULATION  
+let divChapterLowIncome = 
+  "<h3>LOW-TO-MODERATE INCOME POPULATION</h3>" +
+  "<p>Census tracts where the percentage of households with incomes below 80% of Area Median Income (AMI) are shown. Darker purple areas indicate higher concentrations of low-to-moderate income households.</p>";
 
-let divChapter5 =
-  "<h3>BELOW POVERTY</h3>" +
-  '<img src="images/Chapter_4_Image.jpg">' +
-  '<p class="imageCredit"><a href="https://www.nytimes.com/2020/04/09/nyregion/coronavirus-queens-corona-jackson-heights-elmhurst.html">The New York Times</a></p>' +
-  "<p>The South Bronx, perennially marred in social injustice, has also been hard hit during the current COVID-19 outbreak. The area's three main neighborhoods, Mott Haven, Melrose and Port Morris are mostly home to low-income families that have been forced to continue going to work, risking their health and that of their loved ones. Similarly to Jackson Heights in Queens, the areas subway stations have seen a smaller decrease in use than the rest of the city. Median household income in this area oscillates between $15,000 and $30,000.</p>";
+// STREET LEVEL VIEW - Fixed
+let divChapterLowIncomeStreet = 
+  '<h3>STREET-LEVEL VIEW OF AFFECTED AREAS</h3>' +
+  "<p>A closer look at street level shows the actual neighborhoods most affected by flooding and federal budget cuts. These communities face significant challenges with limited resources for flood protection.</p>";
+
+// CLOUDBURST SOLUTIONS
+let divChapterCloudburst = 
+  '<h3>CLOUDBURST SOLUTIONS</h3>' +
+  '<p>Innovative cloudburst infrastructure can help mitigate flooding in vulnerable areas. These solutions were part of projects slated for funding before federal budget cuts.</p>' +
+  '<div style="text-align: center;">' +
+    '<img src="Images/Cloudburst Section.png" style="display: block; width: 100vw; height: auto; margin: 0; padding: 0;">' +
+  '</div>';
+
+// CLOUDBURST DETAILS
+let divChapterCloudburstDetails = 
+  '<h3>HOW CLOUDBURST SYSTEMS WORK</h3>' +
+  '<p>Cloudburst systems combine porous concrete, subsurface storage, and intelligent water management to handle extreme rainfall events while creating more livable streets.</p>' +
+  '<p>These systems can reduce flooding by up to 70% during severe storms, protecting homes and businesses in vulnerable communities.</p>' +
+  '<div style="text-align: center;">' +
+    '<img src="Images/Cloudburst Section Positive.png" style="display: block; width: 100vw; height: auto; margin: 0; padding: 0;">' +
+  '</div>';
+
 
 var config = {
   style: "mapbox://styles/sk3425/cm6o41tya01b701qmdpu9boh5",
@@ -102,7 +147,7 @@ var config = {
   chapters: [
     //311 DATA ZOOMED OUT
     {
-      id: "311 ",
+      id: "311-data",
       alignment: "left",
       hidden: false,
       chapterDiv: divChapter1,
@@ -119,12 +164,12 @@ var config = {
         {
           layer: "311",
           opacity: 1,
-          duration: 0
+          duration: 300
         },
         {
           layer: "311-labels",
           opacity: 1,
-          duration: 0
+          duration: 300
         }
       ],
       onChapterExit: [
@@ -145,9 +190,7 @@ var config = {
       id: "flooding311-chapter2",
       alignment: "left",
       hidden: false,
-      chapterDiv: divChapter1,
-      title: "NYC Flooding Reports",
-      description: "311 reports of street flooding across NYC",
+      chapterDiv: divChapter2,
       location: {
         center: [-73.856, 40.757],
         zoom: 15,
@@ -166,419 +209,381 @@ var config = {
         {
           layer: "311-labels",
           opacity: 1,
-          duration: 300
+          duration: 0
         }
       ],
       onChapterExit: [
         {
           layer: "311",
           opacity: 0,
-          duration: 300
+          duration: 0
         },
         {
           layer: "311-labels",
+          opacity: 0,
+          duration: 0
+        }
+      ]
+    },
+    //FLOOD STREET LEVEL DATA 
+    {
+      id: "flooding_chapter",
+      alignment: "left",
+      hidden: false,
+      chapterDiv: divChapterFloodingRisk,
+      location: {
+        center: [-73.856, 40.757],
+        zoom: 15,
+        pitch: 0,
+        bearing: 0
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [
+        {
+          layer: "all-flooding",
+          opacity: 0.7,
+          duration: 300
+        },
+        {
+          layer: "all-flooding-outline",
+          opacity: 1,
+          duration: 300
+        }
+      ],
+      onChapterExit: [
+        {
+          layer: "all-flooding",
+          opacity: 0,
+          duration: 300
+        },
+        {
+          layer: "all-flooding-outline", 
           opacity: 0,
           duration: 300
         }
       ]
     },
-        //FLOOD STREET LEVEL DATA 
+    // FEMA FLOODING CHAPTER
+    {
+      id: "fema_flooding_chapter",
+      alignment: "left",
+      hidden: false,
+      chapterDiv: divChapterFemaFlooding,
+      location: {
+        center: [-73.856, 40.757],
+        zoom: 12,
+        pitch: 0,
+        bearing: 0
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [
         {
-          id: "flooding_chapter",
-          alignment: "left",
-          hidden: false,
-          title: "Flooding Risk Areas",
-          description: "Areas vulnerable to flooding based on flood risk assessment",
-          location: {
-            center: [-73.856, 40.757], // Center coordinates matching your data
-            zoom: 15,
-            pitch: 0,
-            bearing: 0
-          },
-          mapAnimation: "flyTo",
-          rotateAnimation: false,
-          callback: "",
-          onChapterEnter: [
-            {
-              layer: "all-flooding",
-              opacity: 0.8,
-              duration: 300
-            },
-            {
-              layer: "all-flooding-outline",
-              opacity: 1,
-              duration: 300
-            }
-          ],
-          onChapterExit: [
-            {
-              layer: "all-flooding",
-              opacity: 0,
-              duration: 300
-            },
-            {
-              layer: "all-flooding-outline", 
-              opacity: 0,
-              duration: 300
-            }
-          ]
+          layer: "Fema-flooding",
+          opacity: 0.7,
+          duration: 300
         },
         {
-          id: "fema_flooding_chapter",
-          alignment: "left",
-          hidden: false,
-          title: "FEMA Flood Risk Areas",
-          description: "Areas vulnerable to flooding based on FEMA flood risk assessment",
-          location: {
-            center: [-73.856, 40.757], // Center coordinates matching your data
-            zoom: 12,
-            pitch: 0,
-            bearing: 0
-          },
-          mapAnimation: "flyTo",
-          rotateAnimation: false,
-          callback: "",
-          onChapterEnter: [
-            {
-              layer: "Fema-flooding",
-              opacity: 0.8,
-              duration: 300
-            },
-            {
-              layer: "Fema-flooding-outline",
-              opacity: 1,
-              duration: 300
-            }
-          ],
-          onChapterExit: [
-            {
-              layer: "Fema-flooding",
-              opacity: 0,
-              duration: 300
-            },
-            {
-              layer: "Fema-flooding-outline", 
-              opacity: 0,
-              duration: 300
-            }
-          ]
+          layer: "Fema-flooding-outline",
+          opacity: 1,
+          duration: 300
+        }
+      ],
+      onChapterExit: [
+        {
+          layer: "Fema-flooding",
+          opacity: 0,
+          duration: 300
         },
+        {
+          layer: "Fema-flooding-outline", 
+          opacity: 0,
+          duration: 300
+        }
+      ]
+    },
+    //funding graph 2022, 2025, 2029
+    {
+      id: "funding2022",
+      alignment: "full",
+      hidden: false,
+      chapterDiv: divChapterFunding2022,
+      location: {
+        center: [-73.92, 40.749],
+        zoom: 10,
+        pitch: 0,
+        bearing: 0,
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "showTimelineGraph", 
+      onChapterEnter: [],
+      onChapterExit: [],
+      exitCallback: "hideTimelineGraph"
+    },
+    {
+      id: "funding2025",
+      alignment: "full",
+      hidden: false,
+      chapterDiv: divChapterFunding2025,
+      location: {
+        center: [-73.92, 40.749],
+        zoom: 10,
+        pitch: 0,
+        bearing: 0,
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "showTimelineGraph",
+      onChapterEnter: [],
+      onChapterExit: [],
+      exitCallback: "hideTimelineGraph"
+    },
+    {
+      id: "funding2029",
+      alignment: "full", 
+      hidden: false,
+      chapterDiv: divChapterFunding2029,
+      location: {
+        center: [-73.92, 40.749],
+        zoom: 10,
+        pitch: 0,
+        bearing: 0,
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "showTimelineGraph",
+      onChapterEnter: [],
+      onChapterExit: [],
+      exitCallback: "hideTimelineGraph"
+    },
+    //EJAREAS JUSTICE40
+    {
+      id: "justice",
+      alignment: "full",
+      hidden: false,
+      chapterDiv: divChapterJustice,
+      location: {
+        center: [-73.856, 40.757],
+        zoom: 12,
+        pitch: 0,
+        bearing: 0
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "showJustice40Map",
+      onChapterEnter: [],
+      onChapterExit: [],
+      exitCallback: "hideJustice40Map"
+    },
+    //REDLINED DISTRICTS
+    {
+      id: "REDLINED",
+      alignment: "left",
+      hidden: false,
+      chapterDiv: divChapter3,
+      location: {
+        center: [-73.856, 40.757],
+        zoom: 12,
+        pitch: 0,
+        bearing: 0
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [
+        {
+          layer: "redline",
+          opacity: 1,
+          duration: 300
+        }
+      ],
+      onChapterExit: [
+        {
+          layer: "redline",
+          opacity: 0,
+          duration: 300
+        }
+      ]
+    },
+    //ETHNICITY 
+    {
+      id: "RACE_ETHNICITY",
+      alignment: "left",
+      hidden: false,
+      chapterDiv: divChapterRaceEthnicity,
+      location: {
+        center: [-73.856, 40.757],
+        zoom: 13,
+        pitch: 0,
+        bearing: 0
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [
+        {
+          layer: "race-ethnicity",
+          opacity: 0.8,
+          duration: 300
+        }
+      ],
+      onChapterExit: [
+        {
+          layer: "race-ethnicity",
+          opacity: 0,
+          duration: 300
+        }
+      ]
+    },
+    //DISADVANTAGED COMMUNITIES POPULATION
+    {
+      id: "Disadvantaged",
+      alignment: "left",
+      hidden: false,
+      chapterDiv: divChapterDisadvantaged,
+      location: {
+        center: [-73.856, 40.757],
+        zoom: 13,
+        pitch: 0,
+        bearing: 0,
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [
+        {
+          layer: "DAC",
+          opacity: 1,
+          duration: 300,
+        },
+      ],
+      onChapterExit: [
+        {
+          layer: "DAC",
+          opacity: 0,
+          duration: 300,
+        },
+      ],
+    },
+    //EXTREMELY LOW INCOME POPULATION
+    {
+      id: "LOW_AMI",
+      alignment: "left",
+      hidden: false,
+      chapterDiv: divChapterLowIncome,
+      location: {
+        center: [-73.856, 40.757],
+        zoom: 14,
+        pitch: 0,
+        bearing: 0
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [
+        {
+          layer: "verylowincome",
+          opacity: 0.7,
+          duration: 300
+        }
+      ],
+      onChapterExit: [
+        {
+          layer: "verylowincome",
+          opacity: 0,
+          duration: 300
+        }
+      ]
+    },
+    //STREET LEVEL VIEW
+    {
+      id: "LOW_AMI_STREET_VIEW",
+      alignment: "left",
+      hidden: false,
+      chapterDiv: divChapterLowIncomeStreet,
+      location: {
+        center: [-73.85762, 40.75408],
+        zoom: 25,
+        pitch: 100,
+        bearing: 73
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [],
+      onChapterExit: [
+        {
+          layer: "verylowincome",
+          opacity: 0,
+          duration: 300
+        },
+        {
+          transition: "fadeInCloudburstImage" // This custom transition fades in the cloudburst image
+        }
+      ]
+    },
+    // CLOUDBURST SOLUTION CHAPTER
+    {
+      id: "CLOUDBURST_SOLUTION",
+      alignment: "full",
+      hidden: false,
+      chapterDiv: divChapterCloudburst,
+      mapAnimation: "none",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [], // no fade here, image already visible
+      onChapterExit: [] // do nothing yet
+    },
+    // POSITIVE CLOUDBURST CHAPTER
+    {
+      id: "CLOUDBURST",
+      alignment: "full",
+      hidden: false,
+      chapterDiv: divChapterCloudburstDetails,
+      mapAnimation: "none",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [], // still image visible
+      onChapterExit: [
+        {
+          transition: "fadeOutCloudburstImage" // after user scrolls past this, fade out the image
+        }
+      ]
+    },
+    // Add this to your chapters array in map.js
 {
-  id: "funding2022",
+  id: "queens_video_chapter",
   alignment: "full",
   hidden: false,
-  chapterDiv: divChapterFunding2022,
+  title: "Climate Justice for Queens",
+  description: "Without federal funding, these communities will continue to face increasing flood risks.",
   location: {
-    center: [-73.92, 40.749],
-    zoom: 10,
-    pitch: 0,
-    bearing: 0,
-  },
-  mapAnimation: "flyTo",
-  rotateAnimation: false,
-  callback: "showTimelineGraph", 
-  onChapterEnter: [],
-  onChapterExit: [],
-},
-{
-  id: "funding2025",
-  alignment: "full",
-  hidden: false,
-  chapterDiv: divChapterFunding2025,
-  location: {
-    center: [-73.92, 40.749],
-    zoom: 10,
-    pitch: 0,
-    bearing: 0,
-  },
-  mapAnimation: "flyTo",
-  rotateAnimation: false,
-  callback: "showTimelineGraph", // Same function but it will handle different periods based on chapter ID
-  onChapterEnter: [],
-  onChapterExit: [],
-},
-{
-  id: "funding2029",
-  alignment: "full", 
-  hidden: false,
-  chapterDiv: divChapterFunding2029,
-  location: {
-    center: [-73.92, 40.749],
-    zoom: 10,
-    pitch: 0,
-    bearing: 0,
-  },
-  mapAnimation: "flyTo",
-  rotateAnimation: false,
-  callback: "showTimelineGraph", // Same function handles all three
-  onChapterEnter: [],
-  onChapterExit: [],
-},
-
-//EJAREAS CANCELLED
-
-{
-  id: "justice",
-  alignment: "full",
-  hidden: true,
-  title: "Ejustice40",
-  image: "Images/justice 40.png", // Add this line with the path to your image
-  description: "Areas vulnerable to extreme flooding based on flood risk assessment",
-  chapterDiv: divChapter2,
-  location: {
-    center: "",
-    zoom: 17,
+    // You may need to adjust these coordinates to match your map's focus area
+    center: [-73.8448, 40.7282], // Queens coordinates
+    zoom: 11,
     pitch: 0,
     bearing: 0
   },
   mapAnimation: "flyTo",
   rotateAnimation: false,
-  callback: "",
-  onChapterEnter: [
-    {
-      layer: "Extreme_Flooding",
-      opacity: 0.8,
-      duration: 300
-    }
-  ],
-  onChapterExit: [
-    {
-      layer: "Extreme_Flooding",
-      opacity: 0,
-      duration: 300
-    }
-  ]
-},
-    
-    
-{
-  id: "REDLINED",
-  alignment: "left",
-  hidden: false,
-  chapterDiv: divChapter3,
-  location: {
-    center: [-73.856, 40.757],
-    zoom: 15,
-    pitch: 0,
-    bearing: 0
-  },
-  mapAnimation: "flyTo",
-  rotateAnimation: false,
-  callback: "",
-  onChapterEnter: [
-    {
-      layer: "redline",
-      opacity: 1,
-      duration: 300
-    }
-  ],
-  onChapterExit: [
-    {
-      layer: "redline",
-      opacity: 0,
-      duration: 300
-    }
-  ]
-},
-      {
-        id: "DAC3",
-        alignment: "left",
-        hidden: false,
-        chapterDiv: divChapter3,
-        location: {
-          center: [-73.856, 40.757],
-          zoom: 14,
-          pitch: 0,
-          bearing: 0,
-          // flyTo additional controls-
-          // These options control the flight curve, making it move
-          // slowly and zoom out almost completely before starting
-          // to pan.
-          //speed: 2, // make the flying slow
-          //curve: 1, // change the speed at which it zooms out
-        },
-        mapAnimation: "flyTo",
-        rotateAnimation: false,
-        callback: "",
-        onChapterEnter: [
-          {
-            layer: "DAC3",
-            opacity: 1,
-            duration: 300,
-          },
-        ],
-        onChapterExit: [
-          {
-            layer: "DAC3",
-            opacity: 0,
-            duration: 300,
-          },
-        ],
-      },
-      {
-        id: "DAC4",
-        alignment: "left",
-        hidden: false,
-        chapterDiv: divChapter2,
-        location: {
-          center: [-73.856, 40.757],
-          zoom: 14,
-          pitch: 0,
-          bearing: 0,
-          // flyTo additional controls-
-          // These options control the flight curve, making it move
-          // slowly and zoom out almost completely before starting
-          // to pan.
-          //speed: 2, // make the flying slow
-          //curve: 1, // change the speed at which it zooms out
-        },
-        mapAnimation: "flyTo",
-        rotateAnimation: false,
-        callback: "",
-        onChapterEnter: [
-          {
-            layer: "DAC4",
-            opacity: 1,
-            duration: 300,
-          },
-        ],
-        onChapterExit: [
-          {
-            layer: "DAC4",
-            opacity: 0,
-            duration: 300,
-          },
-        ],
-      },
-      {
-        id: "REDLINED",
-        alignment: "left",
-        hidden: false,
-        chapterDiv: divChapter3,
-        location: {
-          center: [-73.856, 40.757],
-          zoom: 15,
-          pitch: 0,
-          bearing: 0
-        },
-        mapAnimation: "flyTo",
-        rotateAnimation: false,
-        callback: "",
-        onChapterEnter: [
-          {
-            layer: "redline",
-            opacity: 1,
-            duration: 300
-          }
-        ],
-        onChapterExit: [
-          {
-            layer: "redline",
-            opacity: 0,
-            duration: 300
-          }
-        ]
-      },
-      {
-        id: "Ethinicity",
-        alignment: "left",
-        hidden: false,
-        chapterDiv: divChapter3,
-        location: {
-          center: [-73.856, 40.757],
-          zoom: 15,
-          pitch: 0,
-          bearing: 0
-        },
-        mapAnimation: "flyTo",
-        rotateAnimation: false,
-        callback: "",
-        onChapterEnter: [
-          {
-            layer: "race-ethnicity",
-            opacity: 1,
-            duration: 300
-          }
-        ],
-        onChapterExit: [
-          {
-            layer: "race-ethnicitye",
-            opacity: 0,
-            duration: 300
-          }
-        ]
-      },
-      {
-        id: "DAC6",
-        alignment: "left",
-        hidden: false,
-        chapterDiv: divChapter5,
-        location: {
-          center: [-73.856, 40.757],
-          zoom: 14,
-          pitch: 0,
-          bearing: 0,
-          // flyTo additional controls-
-          // These options control the flight curve, making it move
-          // slowly and zoom out almost completely before starting
-          // to pan.
-          //speed: 2, // make the flying slow
-          //curve: 1, // change the speed at which it zooms out
-        },
-        mapAnimation: "flyTo",
-        rotateAnimation: false,
-        callback: "",
-        onChapterEnter: [
-          {
-            layer: "DAC6",
-            opacity: 1,
-            duration: 300,
-          },
-        ],
-        onChapterExit: [
-          {
-            layer: "DAC6",
-            opacity: 0,
-            duration: 300,
-          },
-        ],
-      },
-      {
-        id: "DAC10",
-        alignment: "left",
-        hidden: false,
-        chapterDiv: divChapter4,
-        location: {
-          center: [-73.856, 40.757],
-          zoom: 14,
-          pitch: 0,
-          bearing:0,
-          speed: 0.8,
-          curve: 1.5,
-          // flyTo additional controls-
-          // These options control the flight curve, making it move
-          // slowly and zoom out almost completely before starting
-          // to pan.
-          //speed: 2, // make the flying slow
-          //curve: 1, // change the speed at which it zooms out
-        },
-        mapAnimation: "flyTo",
-        rotateAnimation: false,
-        callback: "",
-        onChapterEnter: [
-          {
-            layer: "311",
-            opacity: 1,
-            duration: 300,
-          },
-        ],
-        onChapterExit: [
-          {
-            layer: "311",
-            opacity: 0,
-            duration: 300,
-          },
-        ],
-      },
-  ],
+  callback: "initQueensVideo",
+  onChapterEnter: [],
+  onChapterExit: [],
+  chapterDiv: '<div style="position: relative; width: 100%; height: 100vh; overflow: hidden;">' +
+    '<video id="queensVideo" muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">' +
+    '<source src="images/Queens.mp4" type="video/mp4">' +
+    'Your browser does not support the video tag.' +
+    '</video>' +
+    '<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3);"></div>' +
+    '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">' +
+    '<h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Climate Justice for Queens</h2>' +
+    '<p style="font-size: 1.2rem; max-width: 600px;">Without federal funding, these communities will continue to face increasing flood risks.</p>' +
+    '</div>' +
+    '</div>'
 }
+  ]
+};
