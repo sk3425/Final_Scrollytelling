@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <title>Mapbox Storytelling</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <link rel="stylesheet" href="https://api.tiles.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.css" />
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v3.8.0/mapbox-gl.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mapbox-gl-globe-minimap@1.2.0/dist/bundle.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://unpkg.com/scrollama"></script>
+</head>
+<body>
+
+  <!-- MAP BACKGROUND -->
+  <div id="map"></div>
+
+  <!-- PERSISTENT GRAPH BACKDROP -->
+  <div id="persistent-graph-container">
+    <div id="graph-inner"></div>
+  </div>
+
+  <!-- SCROLLYTELLING CHAPTERS -->
+  <div id="story"></div>
+
+  <!-- SCRIPTS -->
+  <script src="config.js"></script>
+  <script src="map.js"></script>
+
+
+</body>
+</html>
