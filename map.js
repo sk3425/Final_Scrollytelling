@@ -730,50 +730,52 @@ map.on("load", function () {
     });
   }
 
-  // 311 DATA 
-  map.addLayer({
-    'id': '311',  // This ID should match what you use in the chapter config
-    'type': 'circle',
-    'source': {
-      'type': 'geojson',
-      'data': 'Data/Flooding.geojson'
-    },
-    'paint': {
-      'circle-color': '#00ffea',
-      'circle-opacity': 0,  // Start invisible
-      'circle-radius': [
-        'interpolate', ['linear'], ['zoom'],
-        10, 5,
-        15, 6
-      ]
-    }
-  });
+// 311 DATA 
+map.addLayer({
+  'id': '311',  // This ID should match what you use in the chapter config
+  'type': 'circle',
+  'source': {
+    'type': 'geojson',
+    'data': 'Data/Flooding.geojson'
+  },
+  'paint': {
+    'circle-color': '#00ffea',      // Light blue fill
+    'circle-opacity': 0.7,          // Added opacity (70%)
+    'circle-stroke-color': '#0066aa', // Dark blue border
+    'circle-stroke-width': 1.5,     // Border width
+    'circle-radius': [
+      'interpolate', ['linear'], ['zoom'],
+      10, 5,
+      15, 6
+    ]
+  }
+});
 
-  // 311 DATA LABELS 
-  map.addLayer({
-    'id': '311-labels',  // This ID should match what you use in the chapter config
-    'type': 'symbol',
-    'source': {
-      'type': 'geojson',
-      'data': 'Data/Flooding.geojson'
-    },
-    'layout': {
-      'text-field': 'Complaint: Street Flooding',
-      'text-size': 12,
-      'text-offset': [0, -1.5],
-      'text-anchor': 'bottom',
-      'text-max-width': 8,
-      'text-allow-overlap': false,
-      'text-ignore-placement': false
-    },
-    'paint': {
-      'text-color': '#000000',
-      'text-halo-color': '#ffffff',
-      'text-halo-width': 1,
-      'text-opacity': 0  // Start invisible
-    },
-    'minzoom': 13
-  });
+// 311 DATA LABELS
+map.addLayer({
+  'id': '311-labels',
+  'type': 'symbol',
+  'source': {
+    'type': 'geojson',
+    'data': 'Data/Flooding.geojson'
+  },
+  'layout': {
+    'text-field': 'Complaint: Street Flooding',
+    'text-size': 12,
+    'text-offset': [0, -1.5],
+    'text-anchor': 'bottom',
+    'text-max-width': 8,
+    'text-allow-overlap': false,
+    'text-ignore-placement': false
+  },
+  'paint': {
+    'text-color': '#000000',
+    'text-halo-color': '#ffffff',
+    'text-halo-width': 1,
+    'text-opacity': 0.7  // Changed from 0 to match point opacity
+  },
+  'minzoom': 13
+});
 
   // STREET LEVEL FLOODING DATA 
   map.addLayer({
