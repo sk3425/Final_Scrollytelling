@@ -739,19 +739,20 @@ map.addLayer({
     'data': 'Data/Flooding.geojson'
   },
   'paint': {
-    'circle-color': '#00ffea',      // Light blue fill
-    'circle-opacity': 0.7,          // Added opacity (70%)
-    'circle-stroke-color': '#0066aa', // Dark blue border
-    'circle-stroke-width': 1.5,     // Border width
+    'circle-color': '#0066aa',       // Darker blue fill
+    'circle-opacity': 0,           // 70% opacity for fill
+    'circle-stroke-color': '#003366', // Much darker blue border
+    'circle-stroke-width': 1.5,        // 4 times thicker (from 1.5 to 6)
+    'circle-stroke-opacity': 0,    // 50% opacity for border
     'circle-radius': [
       'interpolate', ['linear'], ['zoom'],
-      10, 5,
+      10, 0.7,
       15, 6
     ]
   }
 });
 
-// 311 DATA LABELS
+// 311 DATA LABELS 
 map.addLayer({
   'id': '311-labels',
   'type': 'symbol',
@@ -772,66 +773,66 @@ map.addLayer({
     'text-color': '#000000',
     'text-halo-color': '#ffffff',
     'text-halo-width': 1,
-    'text-opacity': 0.7  // Changed from 0 to match point opacity
+    'text-opacity': 0.7  // Keeping this the same
   },
   'minzoom': 13
 });
 
-  // STREET LEVEL FLOODING DATA 
-  map.addLayer({
-    'id': 'all-flooding',
-    'type': 'fill',
-    'source': {
-      'type': 'geojson',
-      'data': 'Data/Clipped gs.geojson'
-    },
-    'paint': {
-      'fill-color': '#00ffea',
-      'fill-opacity': 0  // Start invisible
-    }
-  });
-  
-  map.addLayer({
-    'id': 'all-flooding-outline',
-    'type': 'line',
-    'source': {
-      'type': 'geojson',
-      'data': 'Data/Clipped gs.geojson'
-    },
-    'paint': {
-      'line-color': '#000',
-      'line-width': 1,
-      'line-opacity': 0  // Start invisible
-    }
-  });
+// STREET LEVEL FLOODING DATA 
+map.addLayer({
+  'id': 'all-flooding',
+  'type': 'fill',
+  'source': {
+    'type': 'geojson',
+    'data': 'Data/Clipped gs.geojson'
+  },
+  'paint': {
+    'fill-color': '#0066aa',      // Darker blue fill (#0066aa)
+    'fill-opacity': 0             // Start invisible
+  }
+});
 
-  // FEMA FLOODING DATA
-  map.addLayer({
-    'id': 'Fema-flooding',
-    'type': 'fill',
-    'source': {
-      'type': 'geojson',
-      'data': 'Data/Fema.geojson'
-    },
-    'paint': {
-      'fill-color': '#00ffea',
-      'fill-opacity': 0  // Start invisible
-    }
-  });
-  
-  map.addLayer({
-    'id': 'Fema-flooding-outline',
-    'type': 'line',
-    'source': {
-      'type': 'geojson',
-      'data': 'Data/Fema.geojson'
-    },
-    'paint': {
-      'line-color': '#000',
-      'line-width': 1,
-      'line-opacity': 0  // Start invisible
-    }
-  });
+map.addLayer({
+  'id': 'all-flooding-outline',
+  'type': 'line',
+  'source': {
+    'type': 'geojson',
+    'data': 'Data/Clipped gs.geojson'
+  },
+  'paint': {
+    'line-color': '#003366',      // Darker blue outline (#003366)
+    'line-width': 2,              // Slightly thicker line
+    'line-opacity': 0             // Start invisible
+  }
+});
+
+// FEMA FLOODING DATA
+map.addLayer({
+  'id': 'Fema-flooding',
+  'type': 'fill',
+  'source': {
+    'type': 'geojson',
+    'data': 'Data/Fema.geojson'
+  },
+  'paint': {
+    'fill-color': '#0066aa',      // Darker blue fill (#0066aa)
+    'fill-opacity': 0             // Start invisible
+  }
+});
+
+map.addLayer({
+  'id': 'Fema-flooding-outline',
+  'type': 'line',
+  'source': {
+    'type': 'geojson',
+    'data': 'Data/Fema.geojson'
+  },
+  'paint': {
+    'line-color': '#003366',      // Darker blue outline (#003366)
+    'line-width': 0,              // Slightly thicker line
+    'line-opacity': 0             // Start invisible
+  }
+});
 
   // REDLINE
   map.addLayer({
@@ -963,6 +964,14 @@ map.addLayer({
   }
 };
 
+// 311 DATA
+// Define the callback function to immediately show point data
+function showPointData() {
+  // Force immediate visibility of the layers
+  map.setPaintProperty('311', 'circle-opacity', 0.7);
+  map.setPaintProperty('311', 'circle-stroke-opacity', 0.5);
+  map.setPaintProperty('311-labels', 'text-opacity', 0.7);
+}
 // Setup the instance of scrollama
 const scroller = scrollama();
 

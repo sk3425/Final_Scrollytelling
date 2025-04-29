@@ -204,24 +204,21 @@ var config = {
         {
           layer: "311",
           opacity: 1,
-          duration: 0
+
         },
         {
           layer: "311-labels",
           opacity: 1,
-          duration: 0
         }
       ],
       onChapterExit: [
         {
           layer: "311",
           opacity: 0,
-          duration: 0
         },
         {
           layer: "311-labels",
           opacity: 0,
-          duration: 0
         }
       ]
     },
