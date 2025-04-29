@@ -8,7 +8,7 @@ let footerDiv = "";
 // Put all content in the descriptionDiv with white text and a more reliable method to display delayed text
 let descriptionDiv =
   '<div class="intro-section" style="position: relative; width: 100vw; height: 100vh; overflow: hidden; margin: 0; padding: 0;">' +
-    '<video class="intro-video" autoplay muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;"><source src="images/basement flood.mp4" type="video/mp4">Your browser does not support the video tag.</video>' +
+    '<video class="intro-video" autoplay muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;"><source src="Images/basement flood.mp4" type="video/mp4">Your browser does not support the video tag.</video>' +
     '<div class="intro-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); z-index: 2;"></div>' +
     '<div id="delayed-text" class="intro-text" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 3; text-align: center; max-width: 80%; color: #ffffff;">' +
       '<h4 style="font-size: 1.2rem; margin-bottom: 0.5rem; font-family: \'Gill Sans\', \'Helvetica\', sans-serif;">Threads | Storytelling with Maps</h4>' +
@@ -147,7 +147,7 @@ var config = {
   chapters: [
     //311 DATA ZOOMED OUT
     {
-      id: "311-data",
+      id: "311-data-zoomedout",
       alignment: "left",
       hidden: false,
       chapterDiv: divChapter1,
@@ -162,24 +162,24 @@ var config = {
       callback: "",
       onChapterEnter: [
         {
-          layer: "311",
+          layer: "311A",
           opacity: 1,
           duration: 300
         },
         {
-          layer: "311-labels",
+          layer: "311A-labels",
           opacity: 1,
           duration: 300
         }
       ],
       onChapterExit: [
         {
-          layer: "311",
+          layer: "311A",
           opacity: 0,
           duration: 300
         },
         {
-          layer: "311-labels",
+          layer: "311A-labels",
           opacity: 0,
           duration: 300
         }
@@ -187,7 +187,7 @@ var config = {
     },
     //311 DATA ZOOMED IN
     {
-      id: "flooding311-chapter2",
+      id: "311-data-zoomedin",
       alignment: "left",
       hidden: false,
       chapterDiv: divChapter2,
@@ -575,7 +575,7 @@ var config = {
   onChapterExit: [],
   chapterDiv: '<div style="position: relative; width: 100%; height: 100vh; overflow: hidden;">' +
     '<video id="queensVideo" muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">' +
-    '<source src="images/Queens.mp4" type="video/mp4">' +
+    '<source src="Images/Queens.mp4" type="video/mp4">' +
     'Your browser does not support the video tag.' +
     '</video>' +
     '<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3);"></div>' +

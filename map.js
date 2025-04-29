@@ -736,7 +736,7 @@ map.on("load", function () {
     'type': 'circle',
     'source': {
       'type': 'geojson',
-      'data': 'data/Flooding.geojson'
+      'data': 'Data/Flooding.geojson'
     },
     'paint': {
       'circle-color': '#00ffea',
@@ -755,7 +755,7 @@ map.on("load", function () {
     'type': 'symbol',
     'source': {
       'type': 'geojson',
-      'data': 'data/Flooding.geojson'
+      'data': 'Data/Flooding.geojson'
     },
     'layout': {
       'text-field': 'Complaint: Street Flooding',
