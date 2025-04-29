@@ -118,6 +118,8 @@ let divChapterCloudburstDetails =
   '<div style="text-align: center;">' +
     '<img src="Images/Cloudburst Section Positive.png" style="display: block; width: 100vw; height: auto; margin: 0; padding: 0;">' +
   '</div>';
+  
+  
 
 
 var config = {
@@ -357,25 +359,48 @@ var config = {
       onChapterExit: [],
       exitCallback: "hideTimelineGraph"
     },
-    //EJAREAS JUSTICE40
+  
+//EJAREAS JUSTICE40
+{
+  id: "justice",
+  alignment: "full",
+  hidden: false,
+  chapterDiv: divChapterJustice,
+  location: {
+    center: [-73.856, 40.757],
+    zoom: 12,
+    pitch: 0,
+    bearing: 0
+  },
+  mapAnimation: "flyTo",
+  rotateAnimation: false,
+  callback: "", // Remove the callback or leave empty
+  onChapterEnter: [
     {
-      id: "justice",
-      alignment: "full",
-      hidden: false,
-      chapterDiv: divChapterJustice,
-      location: {
-        center: [-73.856, 40.757],
-        zoom: 12,
-        pitch: 0,
-        bearing: 0
-      },
-      mapAnimation: "flyTo",
-      rotateAnimation: false,
-      callback: "showJustice40Map",
-      onChapterEnter: [],
-      onChapterExit: [],
-      exitCallback: "hideJustice40Map"
+      layer: "justice40-layer", // Use your actual layer ID
+      opacity: 0.7,
+      duration: 0 // Key setting: zero duration for immediate appearance
     },
+    {
+      layer: "justice40-outline", // Use your actual layer ID
+      opacity: 1,
+      duration: 0 // Key setting: zero duration for immediate appearance
+    }
+  ],
+  onChapterExit: [
+    {
+      layer: "justice40-layer", // Use your actual layer ID
+      opacity: 0,
+      duration: 0
+    },
+    {
+      layer: "justice40-outline", // Use your actual layer ID
+      opacity: 0,
+      duration: 0
+    }
+  ],
+  exitCallback: "" // Remove this or leave empty
+},
     //REDLINED DISTRICTS
     {
       id: "REDLINED",

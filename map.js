@@ -89,18 +89,6 @@ function hideMap() {
   document.getElementById('map').classList.remove('visible');
 }
 
-// Function to show the Justice40 map - will be called from chapter callbacks
-function showJustice40Map() {
-  // Implementation would go here
-  console.log("Showing Justice40 map");
-}
-
-// Function to hide the Justice40 map
-function hideJustice40Map() {
-  // Implementation would go here
-  console.log("Hiding Justice40 map");
-}
-
 // Create the timeline graph container that will overlay on the map
 function createTimelineGraph() {
   loadD3Library(function() {
@@ -124,9 +112,9 @@ function createTimelineGraph() {
     // Create the content div
     const contentDiv = document.createElement('div');
     contentDiv.id = 'graph-content';
-    contentDiv.style.width = '90%';
-    contentDiv.style.height = '80vh';
-    contentDiv.style.margin = '10vh auto 0';
+    contentDiv.style.width = '100%';
+    contentDiv.style.height = '100vh';
+    contentDiv.style.margin = '0vh auto 0';
     contentDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.85)';
     contentDiv.style.borderRadius = '10px';
     contentDiv.style.padding = '20px';
@@ -469,6 +457,27 @@ function updateTimelineGraph(chapterId) {
         .style('opacity', 1);
     }
   }
+}
+
+
+//JUSTICE 40MAP
+// Add this to your map.js file
+function showJustice40Map() {
+  // Immediately make the Justice40 map visible
+  map.setPaintProperty('justice40-layer', 'fill-opacity', 0.7);
+  map.setPaintProperty('justice40-outline', 'line-opacity', 1);
+  
+  // Any additional processing can happen afterwards
+  // This ensures the map appears first, then other operations happen
+  
+  // If you're loading data, consider preloading it earlier in your code
+  // so it's ready when this callback runs
+}
+
+function hideJustice40Map() {
+  // Hide the Justice40 map instantly
+  map.setPaintProperty('justice40-layer', 'fill-opacity', 0);
+  map.setPaintProperty('justice40-outline', 'line-opacity', 0);
 }
 
 // Function to show the timeline graph - called from chapter callbacks
@@ -972,6 +981,53 @@ function showPointData() {
   map.setPaintProperty('311', 'circle-stroke-opacity', 0.5);
   map.setPaintProperty('311-labels', 'text-opacity', 0.7);
 }
+
+
+//queens VIDEO
+function initQueensVideo() {
+  const video = document.getElementById('queensVideo');
+  
+  // Most browsers require a user interaction before allowing autoplay with sound
+  // This is a workaround to try to play with sound when the chapter is activated
+  video.muted = false; // Ensure audio is not muted
+  
+  // Try to play the video
+  const playPromise = video.play();
+  
+  // Handle potential autoplay restrictions
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      // Playback started successfully with audio
+      console.log("Video playing with audio");
+    }).catch(error => {
+      // Autoplay with audio was prevented by the browser
+      console.log("Autoplay with audio prevented by browser:", error);
+      
+      // Fallback: try to play muted (most browsers allow this)
+      video.muted = true;
+      video.play().then(() => {
+        // Add a button to unmute
+        const unmuteBtn = document.createElement('button');
+        unmuteBtn.innerText = "🔊 Tap for Sound";
+        unmuteBtn.style.position = "absolute";
+        unmuteBtn.style.bottom = "20px";
+        unmuteBtn.style.right = "20px";
+        unmuteBtn.style.padding = "10px";
+        unmuteBtn.style.backgroundColor = "rgba(0,0,0,0.5)";
+        unmuteBtn.style.color = "white";
+        unmuteBtn.style.border = "none";
+        unmuteBtn.style.borderRadius = "5px";
+        unmuteBtn.style.cursor = "pointer";
+        unmuteBtn.onclick = function() {
+          video.muted = false;
+          this.remove();
+        };
+        video.parentNode.appendChild(unmuteBtn);
+      });
+    });
+  }
+}
+
 // Setup the instance of scrollama
 const scroller = scrollama();
 

@@ -22,11 +22,25 @@
   
   <!-- SCROLLYTELLING CHAPTERS -->
   <div id="story"></div>
+
+  <video id="queensVideo" muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"></video>
+
+  chapterDiv: '<div style="position: relative; width: 100%; height: 100vh; overflow: hidden;">' +
+    '<video id="queensVideo" loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">' +
+    '<source src="Images/Queens.mp4" type="video/mp4">' +
+    'Your browser does not support the video tag.' +
+    '</video>' +
+    '<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3);"></div>' +
+    '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">' +
+    '<h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Climate Justice for Queens</h2>' +
+    '<p style="font-size: 1.2rem; max-width: 600px;">Without federal funding, these communities will continue to face increasing flood risks.</p>' +
+    '</div>' +
+    '</div>'
   
   <!-- CLOUDBURST OVERLAY - Just one instance with correct styling -->
-  <div id="cloudburstOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; opacity: 0; transition: opacity 1.5s ease; pointer-events: none;">
+  <!-- <div id="cloudburstOverlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; opacity: 0; transition: opacity 1.5s ease; pointer-events: none;">
     <img src="Images/Cloudburst Section.png" alt="Cloudburst Section" style="width: 100%; height: 100%; object-fit: cover;">
-  </div>
+  </div> -->
   
   <!-- SCRIPTS -->
   <script src="config.js"></script>
