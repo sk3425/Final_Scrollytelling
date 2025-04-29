@@ -72,7 +72,7 @@ let divChapterFunding2029 =
 // EJAREAS CANCELLED
 let divChapterJustice = 
   "<h3>ENVIRONMENTAL JUSTICE AREAS (EJUSTICE40)</h3>" +
-  '<img src="images/justice 40.png">' + 
+  '<img src="Images/justice 40.png">' + 
   "<p>Areas vulnerable to extreme flooding based on flood risk assessment, disproportionately affecting environmental justice communities.</p>" +
   "<p><button onclick='toggleJustice40Map()' style='padding: 10px; background-color: #0078ff; color: white; border: none; border-radius: 5px; cursor: pointer;'>Toggle Justice40 Map</button></p>";
 
@@ -164,24 +164,24 @@ var config = {
         {
           layer: "311A",
           opacity: 1,
-          duration: 300
+          duration: 0
         },
         {
           layer: "311A-labels",
           opacity: 1,
-          duration: 300
+          duration: 0
         }
       ],
       onChapterExit: [
         {
           layer: "311A",
           opacity: 0,
-          duration: 300
+          duration: 0
         },
         {
           layer: "311A-labels",
           opacity: 0,
-          duration: 300
+          duration: 0
         }
       ]
     },
@@ -204,7 +204,7 @@ var config = {
         {
           layer: "311",
           opacity: 1,
-          duration: 300
+          duration: 0
         },
         {
           layer: "311-labels",

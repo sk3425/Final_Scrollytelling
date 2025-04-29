@@ -743,7 +743,7 @@ map.on("load", function () {
       'circle-opacity': 0,  // Start invisible
       'circle-radius': [
         'interpolate', ['linear'], ['zoom'],
-        10, 1,
+        10, 5,
         15, 6
       ]
     }
