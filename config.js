@@ -38,11 +38,90 @@ let divChapter1 =
   "<h3>311 COMPLAINTS</h3>" +
   "<p>311 complaints about flooding in NYC show patterns of street flooding reports across the city, with particular concentration in certain areas of Queens.</p>";
 
-// 311 DATA ZOOMED IN
+// 311 DATA ZOOMED IN 
+// Update the divChapter2 content to include audio clips with the correct file paths
+
 let divChapter2 = 
   "<h3>NYC Flooding Reports</h3>" +
-  "<p>311 reports of street flooding across NYC, zoomed in to show detail in affected neighborhoods. Click on the audio markers to hear residents' accounts of flooding.</p>";
-
+  "<p>311 reports of street flooding across NYC, zoomed in to show detail in affected neighborhoods.</p>" +
+  "<div class='audio-container' style='margin-top: 10px; display: flex; gap: 8px;'>" +
+    
+    // Just tiny play buttons without text or background
+    "<button class='play-button' data-audio-id='audio1' data-title='Flooded Cars' style='background-color: #3FB1CE; color: white; width: 16px; height: 16px; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; padding: 0; font-size: 8px; box-shadow: none;'>▶</button>" +
+    
+    "<button class='play-button' data-audio-id='audio2' data-title='Entire Roadway Flooded' style='background-color: #3FB1CE; color: white; width: 16px; height: 16px; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; padding: 0; font-size: 8px; box-shadow: none;'>▶</button>" +
+    
+    "<button class='play-button' data-audio-id='audio3' data-title='Water Up To My Knee' style='background-color: #3FB1CE; color: white; width: 16px; height: 16px; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; padding: 0; font-size: 8px; box-shadow: none;'>▶</button>" +
+  "</div>" +
+  
+  // Audio elements (hidden)
+  "<audio id='audio1' src='Images/1FloodedCars.mp3' preload='none'></audio>" +
+  "<audio id='audio2' src='Images/2ThisEntireRoadwayWasFlooded.mp3' preload='none'></audio>" +
+  "<audio id='audio3' src='Images/3WaterUpToMyKnee.mp3' preload='none'></audio>" +
+  
+  // Add JavaScript to handle audio playback - simplified for tiny buttons
+  "<script>" +
+    "document.addEventListener('DOMContentLoaded', function() {" +
+      "let currentlyPlaying = null;" +
+      "let buttons = document.querySelectorAll('.play-button');" +
+      
+      "// Add tooltip functionality for tiny icons" +
+      "buttons.forEach(button => {" +
+        "button.setAttribute('title', button.getAttribute('data-title'));" +
+      "});" +
+      
+      "// Add click listeners to all buttons" +
+      "buttons.forEach(button => {" +
+        "button.addEventListener('click', function() {" +
+          "const audioId = this.getAttribute('data-audio-id');" +
+          "const audio = document.getElementById(audioId);" +
+          
+          "if (!audio) {" +
+            "console.error('Audio element not found:', audioId);" +
+            "return;" +
+          "}" +
+          
+          "// If this audio is already playing, pause it" +
+          "if (currentlyPlaying === audio) {" +
+            "audio.pause();" +
+            "audio.currentTime = 0;" +
+            "this.innerHTML = '▶';" +
+            "currentlyPlaying = null;" +
+            "return;" +
+          "}" +
+          
+          "// Stop any currently playing audio" +
+          "if (currentlyPlaying) {" +
+            "currentlyPlaying.pause();" +
+            "currentlyPlaying.currentTime = 0;" +
+            "document.querySelector(`[data-audio-id='${currentlyPlaying.id}']`).innerHTML = '▶';" +
+          "}" +
+          
+          "// Force audio to load and play" +
+          "audio.load();" +
+          "const playPromise = audio.play();" +
+          
+          "if (playPromise !== undefined) {" +
+            "playPromise.then(_ => {" +
+              "// Playback started successfully" +
+              "this.innerHTML = '■';" +
+              "currentlyPlaying = audio;" +
+            "}).catch(error => {" +
+              "console.error('Playback failed:', error);" +
+              // Show alert about possible CORS or file path issues
+              "alert('Audio playback failed. Please check file paths and server permissions.');" +
+            "});" +
+          "}" +
+          
+          "// Reset button when audio ends" +
+          "audio.onended = function() {" +
+            "document.querySelector(`[data-audio-id='${audioId}']`).innerHTML = '▶';" +
+            "currentlyPlaying = null;" +
+          "};" +
+        "});" +
+      "});" +
+    "});" +
+  "</script>";
 // FLOOD STREET LEVEL DATA
 let divChapterFloodingRisk = 
   "<h3>Flooding Risk Areas</h3>" +
@@ -64,23 +143,7 @@ let divChapterFemaFlooding =
   "<h3>FEMA Flood Risk Areas</h3>" +
   "<p>Areas vulnerable to flooding based on FEMA flood risk assessment, showing broader flood risk zones across the region.</p>";
 
-// FUNDING GRAPH 2022, 2025, 2029
-let divChapterFunding2022 = 
-  "<h3>2022: THE PEAK OF CLIMATE FUNDING</h3>" +
-  "<p>In 2022, federal emergency climate funding reached an unprecedented $10.2 billion following the Infrastructure Investment and Jobs Act and IRA implementation, with $3B dedicated to Environmental and Climate Justice Program grants.</p>" +
-  "<p>This peak funding meant Queens was slated to receive over $200 million for critical flood prevention projects, including innovative cloudburst systems designed to protect vulnerable neighborhoods.</p>";
-
-let divChapterFunding2025 = 
-  "<h3>2025: THE COLLAPSE OF CLIMATE PROTECTION</h3>" +
-  "<p>By 2025, emergency climate funding plummeted to just $200 million - a 98% drop in just three years. The FEMA BRIC program was completely eliminated, cutting $882 million in national disaster preparedness funding.</p>" +
-  "<p>These cuts directly impacted Queens, with the cancellation of critical flood protection projects in East Elmhurst ($50M), Corona ($47M), and Kissena Park ($46M) - areas that were among the hardest hit during Hurricane Ida.</p>";
-
-let divChapterFunding2029 = 
-  "<h3>2029: THE CONSEQUENCES FOR VULNERABLE COMMUNITIES</h3>" +
-  "<p>Projections show emergency climate funding will remain at just $50 million through 2029 - 99.5% below 2022 levels. With virtually no federal flood protection funding, New York could lose 80,000 homes to flooding in the next 15 years.</p>" +
-  "<p>Studies indicate that every $1 invested in disaster prevention saves $6 in recovery costs. These cuts leave Queens neighborhoods particularly vulnerable, as they were among the hardest hit during Hurricane Ida in 2021, when 11 residents lost their lives.</p>";
-
-// Define chapter content div elements
+// JUSTICE 40
 let divChapterJustice1 = 
   "<h3>ENVIRONMENTAL JUSTICE AREAS (JUSTICE40)</h3>" +
   '<img src="Images/justice40_gone.png" style="width: 100%; height: auto; border:none; box-shadow: none; display: block; margin: 0; padding: 0;">';
@@ -114,6 +177,15 @@ let divChapterLowIncomeStreet =
   '<h3>STREET-LEVEL VIEW OF AFFECTED AREAS</h3>' +
   "<p>A closer look at street level shows the actual neighborhoods most affected by flooding and federal budget cuts. These communities face significant challenges with limited resources for flood protection.</p>";
 
+// CLOUDBURST DETAILS
+let divChapterCloudburstDetails = 
+'<h3>HOW CLOUDBURST SYSTEMS WORK</h3>' +
+'<p>Cloudburst systems combine porous concrete, subsurface storage, and intelligent water management to handle extreme rainfall events while creating more livable streets.</p>' +
+'<p>These systems can reduce flooding by up to 70% during severe storms, protecting homes and businesses in vulnerable communities.</p>' +
+'<div style="text-align: center;">' +
+  '<img src="Images/Cloudburst Section Positive.png" style="display: block; width: 100vw; height: auto; margin: 0; padding: 0;">' +
+'</div>';
+
 // CLOUDBURST SOLUTIONS
 let divChapterCloudburst = 
   '<h3>CLOUDBURST SOLUTIONS</h3>' +
@@ -122,16 +194,6 @@ let divChapterCloudburst =
     '<img src="Images/Cloudburst Section.png" style="display: block; width: 100vw; height: auto; margin: 0; padding: 0;">' +
   '</div>';
 
-// CLOUDBURST DETAILS
-let divChapterCloudburstDetails = 
-  '<h3>HOW CLOUDBURST SYSTEMS WORK</h3>' +
-  '<p>Cloudburst systems combine porous concrete, subsurface storage, and intelligent water management to handle extreme rainfall events while creating more livable streets.</p>' +
-  '<p>These systems can reduce flooding by up to 70% during severe storms, protecting homes and businesses in vulnerable communities.</p>' +
-  '<div style="text-align: center;">' +
-    '<img src="Images/Cloudburst Section Positive.png" style="display: block; width: 100vw; height: auto; margin: 0; padding: 0;">' +
-  '</div>';
-
-// QUEENS VIDEO CHAPTER
 // QUEENS VIDEO CHAPTER
 let divChapterQueensVideo =  
   '<div style="position: relative; width: 100%; height: 100vh; overflow: hidden;">' +
@@ -147,7 +209,6 @@ let divChapterQueensVideo =
       '});' +
     '</script>' +
   '</div>';
-
 
 var config = {
   style: "mapbox://styles/sk3425/cm6o41tya01b701qmdpu9boh5",
@@ -200,77 +261,46 @@ var config = {
       onChapterExit: []
     },
     
-
-// 311 DATA ZOOMED IN with AUDIO
-{
-  id: "311-data-zoomedin",
-  alignment: "left",
-  hidden: false,
-  chapterDiv: divChapter2,
-  location: {
-    center: [-73.856, 40.757],
-    zoom: 15,
-    pitch: 0,
-    bearing: 0
-  },
-  mapAnimation: "flyTo",
-  rotateAnimation: false,
-  callback: "",
-  onChapterEnter: [
+    //311 data zoomed in
     {
-      layer: "311",
-      opacity: 1,
-      duration: 300
-    },
-    {
-      layer: "311-labels",
-      opacity: 1,
-      duration: 300
-    },
-    {
-      // This callback will explicitly show only in this chapter
-      callback: function() {
-        // Show all audio markers
-        document.querySelectorAll('.audio-marker').forEach(el => {
-          el.style.display = 'block';
-        });
-        // Initialize floating effect
-        if (typeof initializeAudioMarkers === 'function') {
-          initializeAudioMarkers();
+      id: "311-data-zoomedin",
+      alignment: "left",
+      hidden: false,
+      chapterDiv: divChapter2,
+      location: {
+        center: [-73.856, 40.757],
+        zoom: 15,
+        pitch: 0,
+        bearing: 0
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [
+        {
+          layer: "311",
+          opacity: 1,
+          duration: 300
+        },
+        {
+          layer: "311-labels",
+          opacity: 1,
+          duration: 300
         }
-      }
-    }
-  ],
-  onChapterExit: [
-    {
-      layer: "311",
-      opacity: 0,
-      duration: 300
+      ],
+      onChapterExit: [
+        {
+          layer: "311",
+          opacity: 0,
+          duration: 300
+        },
+        {
+          layer: "311-labels",
+          opacity: 0,
+          duration: 300
+        }
+      ]
     },
-    {
-      layer: "311-labels",
-      opacity: 0,
-      duration: 300
-    },
-
-
-    {
-      // This callback will explicitly hide when exiting this chapter
-      callback: function() {
-        // Hide all audio markers and pause any audio
-        document.querySelectorAll('.audio-marker').forEach(el => {
-          el.style.display = 'none';
-          const audio = el.querySelector('audio');
-          if (audio) {
-            audio.pause();
-            const playBtn = el.querySelector('.audio-play-btn');
-            if (playBtn) playBtn.innerHTML = '▶️';
-          }
-        });
-      }
-    }
-  ]
-},
     
     // FLOOD STREET LEVEL DATA 
     {
@@ -278,6 +308,36 @@ var config = {
       alignment: "left",
       hidden: false,
       chapterDiv: divChapterFloodingRisk,
+      location: {
+        center: [-73.856, 40.757],
+        zoom: 15,
+        pitch: 0,
+        bearing: 0
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [
+        {
+          layer: "all-flooding",
+          opacity: 0.7,
+          duration: 300
+        },
+        {
+          layer: "all-flooding-outline",
+          opacity: 1,
+          duration: 300
+        }
+      ],
+      onChapterExit: []
+    },
+
+    // FLOOD VIDEO CHAPTER
+    {
+      id: "flood_video_chapter",
+      alignment: "left",
+      hidden: false,
+      chapterDiv: divChapterFloodvideo,
       location: {
         center: [-73.856, 40.757],
         zoom: 15,
@@ -312,47 +372,6 @@ var config = {
         }
       ]
     },
-    
- // FLOOD VIDEO CHAPTER
-{
-  id: "flood_video_chapter",
-  alignment: "left",
-  hidden: false,
-  chapterDiv: divChapterFloodvideo,
-  location: {
-    center: [-73.856, 40.757],
-    zoom: 15,
-    pitch: 0,
-    bearing: 0
-  },
-  mapAnimation: "flyTo",
-  rotateAnimation: false,
-  callback: "",
-  onChapterEnter: [
-    {
-      layer: "all-flooding",
-      opacity: 0.7,  // Changed from 0 to 0.7 to make the flooding layer visible
-      duration: 300  // Added duration for smooth fade-in
-    },
-    {
-      layer: "all-flooding-outline",
-      opacity: 1,
-      duration: 300  // Added duration for smooth fade-in
-    }
-  ],
-  onChapterExit: [
-    {
-      layer: "all-flooding",
-      opacity: 0,
-      duration: 300
-    },
-    {
-      layer: "all-flooding-outline", 
-      opacity: 0,
-      duration: 300
-    }
-  ]
-},
     
     // FEMA FLOODING CHAPTER
     {
@@ -400,7 +419,7 @@ var config = {
       id: "funding2022",
       alignment: "full",
       hidden: false,
-      chapterDiv: divChapterFunding2022,
+      chapterDiv: "",
       location: {
         center: [-73.92, 40.749],
         zoom: 10,
@@ -420,7 +439,7 @@ var config = {
       id: "funding2025",
       alignment: "full",
       hidden: false,
-      chapterDiv: divChapterFunding2025,
+      chapterDiv: "",
       location: {
         center: [-73.92, 40.749],
         zoom: 10,
@@ -440,7 +459,7 @@ var config = {
       id: "floodFunding",
       alignment: "full",
       hidden: false,
-      chapterDiv: divChapterFunding2029,
+      chapterDiv: "",
       location: {
         center: [-73.92, 40.749],
         zoom: 10,
@@ -455,130 +474,127 @@ var config = {
       exitCallback: "hideTimelineGraph"
     },
     
-// First chapter - justice40_gone image
-{
-  id: "justice40-before",
-  alignment: "full",
-  hidden: false,
-  chapterDiv: divChapterJustice1,
-  location: {
-    center: [-73.856, 40.757],
-    zoom: 9,
-    pitch: 0,
-    bearing: 0
-  },
-  mapAnimation: "flyTo",
-  rotateAnimation: false,
-  callback: "",
-  onChapterEnter: [],
-  onChapterExit: [
-    // Add a longer duration for smoother transition
+    // First chapter - justice40_gone image
     {
-      layer: "background",
-      opacity: 1,
-      duration: 1500
-    }
-  ]
-},
-
-// Second chapter - justice 40 image
-{
-  id: "justice40-after",
-  alignment: "full",
-  hidden: false,
-  chapterDiv: divChapterJustice2,
-  location: {
-    center: [-73.856, 40.757],
-    zoom: 9,
-    pitch: 0,
-    bearing: 0
-  },
-  mapAnimation: "flyTo",
-  rotateAnimation: false,
-  callback: "",
-  onChapterEnter: [
-    // Add a longer fade-in duration
-    {
-      layer: "background",
-      opacity: 1,
-      duration: 1500
-    }
-  ],
-  onChapterExit: []
-},
-
-
-// Third chapter - showing the map layer
-{
-  id: "justice40-map",
-  alignment: "full",
-  hidden: false,
-  chapterDiv: "<h3>ENVIRONMENTAL JUSTICE AREAS (JUSTICE40)</h3>",
-  location: {
-    center: [-73.856, 40.757],
-    zoom: 10,
-    pitch: 0,
-    bearing: 0
-  },
-  mapAnimation: "flyTo",
-  rotateAnimation: false,
-  callback: "",
-  onChapterEnter: [
-    {
-      layer: "justice40-layer",
-      opacity: 0.7,
-      duration: 700
+      id: "justice40-before",
+      alignment: "full",
+      hidden: false,
+      chapterDiv: divChapterJustice1,
+      location: {
+        center: [-73.856, 40.757],
+        zoom: 9,
+        pitch: 0,
+        bearing: 0
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [],
+      onChapterExit: [
+        {
+          layer: "background",
+          opacity: 1,
+          duration: 1500
+        }
+      ]
     },
+
+    // Second chapter - justice 40 image
     {
-      layer: "justice40-outline",
-      opacity: 1,
-      duration: 700
-    }
-  ],
-  onChapterExit: [
-    {
-      layer: "justice40-layer",
-      opacity: 0,
-      duration: 700
+      id: "justice40-after",
+      alignment: "full",
+      hidden: false,
+      chapterDiv: divChapterJustice2,
+      location: {
+        center: [-73.856, 40.757],
+        zoom: 9,
+        pitch: 0,
+        bearing: 0
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [
+        {
+          layer: "background",
+          opacity: 1,
+          duration: 1500
+        }
+      ],
+      onChapterExit: []
     },
+
+    // Third chapter - showing the map layer
     {
-      layer: "justice40-outline",
-      opacity: 0,
-      duration: 700
-    }
-  ]
-},
+      id: "justice40-map",
+      alignment: "full",
+      hidden: false,
+      chapterDiv: "<h3>ENVIRONMENTAL JUSTICE AREAS (JUSTICE40)</h3>",
+      location: {
+        center: [-73.856, 40.757],
+        zoom: 10,
+        pitch: 0,
+        bearing: 0
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [
+        {
+          layer: "justice40-layer",
+          opacity: 0.7,
+          duration: 700
+        },
+        {
+          layer: "justice40-outline",
+          opacity: 1,
+          duration: 700
+        }
+      ],
+      onChapterExit: [
+        {
+          layer: "justice40-layer",
+          opacity: 0,
+          duration: 700
+        },
+        {
+          layer: "justice40-outline",
+          opacity: 0,
+          duration: 700
+        }
+      ]
+    },
     
-// REDLINED DISTRICTS
-{
-  id: "REDLINED",
-  alignment: "left",
-  hidden: false,
-  chapterDiv: divChapter3,
-  location: {
-    center: [-73.856, 40.757],
-    zoom: 12,
-    pitch: 0,
-    bearing: 0
-  },
-  mapAnimation: "flyTo",
-  rotateAnimation: false,
-  callback: "",
-  onChapterEnter: [
+    // REDLINED DISTRICTS
     {
-      layer: "redline",
-      opacity: 1,
-      duration: 300
-    }
-  ],
-  onChapterExit: [
-    {
-      layer: "redline",
-      opacity: 0,
-      duration: 300
-    }
-  ]
-},
+      id: "REDLINED",
+      alignment: "left",
+      hidden: false,
+      chapterDiv: divChapter3,
+      location: {
+        center: [-73.856, 40.757],
+        zoom: 12,
+        pitch: 0,
+        bearing: 0
+      },
+      mapAnimation: "flyTo",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [
+        {
+          layer: "redline",
+          opacity: 1,
+          duration: 300
+        }
+      ],
+      onChapterExit: [
+        {
+          layer: "redline",
+          opacity: 0,
+          duration: 300
+        }
+      ]
+    },
     
     // ETHNICITY 
     {
@@ -701,19 +717,6 @@ var config = {
       ]
     },
     
-    // CLOUDBURST SOLUTION CHAPTER
-    {
-      id: "CLOUDBURST_SOLUTION",
-      alignment: "full",
-      hidden: false,
-      chapterDiv: divChapterCloudburst,
-      mapAnimation: "none",
-      rotateAnimation: false,
-      callback: "",
-      onChapterEnter: [],
-      onChapterExit: []
-    },
-    
     // POSITIVE CLOUDBURST CHAPTER
     {
       id: "CLOUDBURST",
@@ -729,6 +732,19 @@ var config = {
           transition: "fadeOutCloudburstImage"
         }
       ]
+    },
+    
+    // CLOUDBURST SOLUTION CHAPTER
+    {
+      id: "CLOUDBURST_SOLUTION",
+      alignment: "full",
+      hidden: false,
+      chapterDiv: divChapterCloudburst,
+      mapAnimation: "none",
+      rotateAnimation: false,
+      callback: "",
+      onChapterEnter: [],
+      onChapterExit: []
     },
     
     // QUEENS VIDEO CHAPTER

@@ -186,31 +186,38 @@ function updateTimelineGraph(chapterId) {
   }
   
   currentTimelineChapter = chapterId;
-  
-  // Define chapter-specific configurations
-  const chapterConfigs = {
-    'funding2022': {
-      yearRange: [0, 3], // Show 2020 to 2022
-      highlightYear: '2022',
-      title: "2022: THE PEAK OF CLIMATE FUNDING",
-      description: "Federal emergency climate funding reached an unprecedented $10.2 billion",
-      showSeries: ['emergency', 'nonEmergency', 'floodRisk', 'bric']
-    },
-    'funding2025': {
-      yearRange: [0, 9], // Show 2020 to 2025 Q4
-      highlightYear: '2025 Q3',
-      title: "2025: THE COLLAPSE OF CLIMATE PROTECTION",
-      description: "By 2025, emergency climate funding plummeted to just $200 million - an 83% drop",
-      showSeries: ['emergency', 'nonEmergency', 'floodRisk', 'bric']
-    },
-    'floodFunding': {
-      yearRange: [0, 9], // Show 2020 to 2025 Q4
-      highlightYear: '2025 Q3',
-      title: "FLOOD PROTECTION IN DECLINE",
-      description: "Both flood risk funding and FEMA BRIC program have seen dramatic cuts",
-      showSeries: ['floodRisk', 'bric']
-    }
-  };
+ 
+// Define chapter-specific configurations
+const chapterConfigs = {
+  'funding2022': {
+    yearRange: [0, 3], // Show 2020 to 2022
+    highlightYear: '2022',
+    title: "2022: THE PEAK OF CLIMATE FUNDING",
+    description: "In 2022, federal emergency climate funding reached $10.2 billion\n" +
+                 "with $3B for Environmental Justice programs.\n" +
+                 "Queens received $200M for flood prevention projects.",
+    showSeries: ['emergency', 'nonEmergency', 'floodRisk', 'bric']
+  },
+  'funding2025': {
+    yearRange: [0, 9], // Show 2020 to 2025 Q4
+    highlightYear: '2025 Q3',
+    title: "2025: THE COLLAPSE OF CLIMATE PROTECTION",
+    description: "By 2025, funding fell 98% to just $200M with FEMA BRIC eliminated.\n" +
+                 "Critical projects canceled in East Elmhurst ($50M),\n" +
+                 "Corona ($47M), and Kissena Park ($46M).",
+    showSeries: ['emergency', 'nonEmergency', 'floodRisk', 'bric']
+  },
+  'floodFunding': {
+    yearRange: [0, 9], // Show 2020 to 2025 Q4
+    highlightYear: '2025 Q3',
+    title: "FLOOD PROTECTION IN DECLINE",
+    description: "Both flood risk funding and FEMA BRIC program have seen dramatic cuts.\n" +
+                 "$5B in BRIC program funding eliminated, with $882M returned to Treasury.\n" +
+                 "Every $1 in prevention saves $6 in recovery costs.",
+    showSeries: ['floodRisk', 'bric']
+  }
+};
+
   
   // If this isn't a funding chapter, hide the graph
   if (!chapterConfigs[chapterId]) {
