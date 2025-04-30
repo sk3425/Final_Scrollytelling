@@ -33,17 +33,39 @@ const fundingData = [
   { year: '2025 Q1', emergency: 3700, nonEmergency: 7800, floodRisk: 1400, bric: 1300 },
   { year: '2025 Q2', emergency: 1500, nonEmergency: 7000, floodRisk: 800, bric: 0 },
   { year: '2025 Q3', emergency: 250, nonEmergency: 6500, floodRisk: 200, bric: 0 },
-  { year: '2025 Q4', emergency: 200, nonEmergency: 6500, floodRisk: 150, bric: 0 },
-  { year: '2026', emergency: 50, nonEmergency: 7000, floodRisk: 50, bric: 0 },
-  { year: '2027', emergency: 50, nonEmergency: 7000, floodRisk: 50, bric: 0 },
-  { year: '2028', emergency: 50, nonEmergency: 7000, floodRisk: 50, bric: 0 },
-  { year: '2029', emergency: 50, nonEmergency: 7000, floodRisk: 50, bric: 0 }
+  { year: '2025 Q4', emergency: 200, nonEmergency: 6500, floodRisk: 150, bric: 0 }
 ];
+
+// Top 5 emergency climate funds
+const topEmergencyFunds = [
+  { name: "Greenhouse Gas Reduction Fund", amount: "$27B" },
+  { name: "Environmental Justice Program", amount: "$3B" },
+  { name: "NY Climate Disaster Prevention", amount: "$300M" },
+  { name: "FEMA BRIC Program", amount: "$882M" },
+  { name: "Cloudburst Infrastructure Program", amount: "$192M" }
+];
+
+// NYT-style color palette
+const nytColors = {
+  emergency: '#fd8d3c',      // Orange for emergency funding
+  nonEmergency: '#74c476',   // Green for non-emergency
+  floodRisk: '#3182bd',      // Blue for flood risk
+  bric: '#9e9ac8'            // Purple for BRIC program
+};
 
 // Timeline graph variables
 let timelineGraphContainer = null;
 let timelineGraphSvg = null;
 let currentTimelineChapter = null;
+let graphTransition = {
+  active: false,
+  from: null,
+  to: null,
+  progress: 0
+};
+let lastScrollY = 0;
+let scrollDirection = 'down';
+let previousData = null;
 
 // Function to load D3.js dynamically if not already loaded
 function loadD3Library(callback) {
@@ -59,34 +81,33 @@ function loadD3Library(callback) {
   document.head.appendChild(script);
 }
 
-/* The next two functions help turn on and off individual
-layers through their opacity attributes: The first one gets
-the type of layer and the second one adjusts the layer's opacity */
-function getLayerPaintType(layer) {
-  var layerType = map.getLayer(layer).type;
-  return layerTypes[layerType];
-}
-
-function setLayerOpacity(layer) {
-  var paintProps = getLayerPaintType(layer.layer);
-  paintProps.forEach(function (prop) {
-    var options = {};
-    if (layer.duration) {
-      var transitionProp = prop + "-transition";
-      options = { duration: layer.duration };
-      map.setPaintProperty(layer.layer, transitionProp, options);
+// Function to generate scribble-like path with noise
+function generateScribblePath(points, noise = 3) {
+  if (!window.d3 || points.length < 2) return '';
+  
+  let path = `M${points[0][0]},${points[0][1]}`;
+  
+  for (let i = 1; i < points.length; i++) {
+    const [x1, y1] = points[i-1];
+    const [x2, y2] = points[i];
+    
+    // Add small random variations to create hand-drawn appearance
+    const numSegments = Math.ceil(Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)) / 10);
+    
+    for (let j = 1; j <= numSegments; j++) {
+      const ratio = j / numSegments;
+      const xPos = x1 + (x2 - x1) * ratio;
+      const yPos = y1 + (y2 - y1) * ratio;
+      
+      // Add random noise
+      const xNoise = (Math.random() - 0.5) * noise;
+      const yNoise = (Math.random() - 0.5) * noise;
+      
+      path += ` L${xPos + xNoise},${yPos + yNoise}`;
     }
-    map.setPaintProperty(layer.layer, prop, layer.opacity, options);
-  });
-}
-
-// Add these functions to your map.js file after the map initialization
-function showMap() {
-  document.getElementById('map').classList.add('visible');
-}
-
-function hideMap() {
-  document.getElementById('map').classList.remove('visible');
+  }
+  
+  return path;
 }
 
 // Create the timeline graph container that will overlay on the map
@@ -148,6 +169,13 @@ function createTimelineGraph() {
     
     // Add to the map container
     document.getElementById('map').appendChild(timelineGraphContainer);
+    
+    // Track scroll direction to control animation
+    window.addEventListener('scroll', function() {
+      const currentScrollY = window.scrollY;
+      scrollDirection = currentScrollY > lastScrollY ? 'down' : 'up';
+      lastScrollY = currentScrollY;
+    });
   });
 }
 
@@ -165,19 +193,22 @@ function updateTimelineGraph(chapterId) {
       yearRange: [0, 3], // Show 2020 to 2022
       highlightYear: '2022',
       title: "2022: THE PEAK OF CLIMATE FUNDING",
-      description: "Federal emergency climate funding reached an unprecedented $10.2 billion"
+      description: "Federal emergency climate funding reached an unprecedented $10.2 billion",
+      showSeries: ['emergency', 'nonEmergency', 'floodRisk', 'bric']
     },
     'funding2025': {
       yearRange: [0, 9], // Show 2020 to 2025 Q4
       highlightYear: '2025 Q3',
       title: "2025: THE COLLAPSE OF CLIMATE PROTECTION",
-      description: "By 2025, emergency climate funding plummeted to just $200 million - a 98% drop"
+      description: "By 2025, emergency climate funding plummeted to just $200 million - an 83% drop",
+      showSeries: ['emergency', 'nonEmergency', 'floodRisk', 'bric']
     },
-    'funding2029': {
-      yearRange: [0, 13], // Show full range to 2029/2030
-      highlightYear: '2026',
-      title: "2029: THE CONSEQUENCES FOR VULNERABLE COMMUNITIES",
-      description: "Projections show emergency climate funding will remain at just $50 million through 2029"
+    'floodFunding': {
+      yearRange: [0, 9], // Show 2020 to 2025 Q4
+      highlightYear: '2025 Q3',
+      title: "FLOOD PROTECTION IN DECLINE",
+      description: "Both flood risk funding and FEMA BRIC program have seen dramatic cuts",
+      showSeries: ['floodRisk', 'bric']
     }
   };
   
@@ -207,8 +238,6 @@ function updateTimelineGraph(chapterId) {
   const height = svgContainer.clientHeight - margin.top - margin.bottom;
   
   // Create SVG
-  d3.select('#timeline-svg-container').selectAll('*').remove();
-
   const svg = d3.select('#timeline-svg-container')
     .append('svg')
     .attr('width', '100%')
@@ -220,14 +249,51 @@ function updateTimelineGraph(chapterId) {
   // Get data for this chapter
   const chapterData = fundingData.slice(config.yearRange[0], config.yearRange[1]);
   
+  // Store the current data for transition effects
+  if (previousData === null) {
+    previousData = chapterData;
+  }
+  
+  // Determine transition data based on scroll direction and current chapter
+  let transitionData = chapterData;
+  if (graphTransition.active) {
+    // Create data for transitions
+    if (scrollDirection === 'down' && (chapterId === 'funding2025' || chapterId === 'floodFunding')) {
+      // Transitioning from 2022 to 2025 or floodFunding (extending the graph)
+      const startData = fundingData.slice(0, 3); // 2020-2022
+      const endData = fundingData.slice(0, 9);   // 2020-2025 Q4
+      
+      // Calculate how much of the new data to show based on progress
+      const progress = graphTransition.progress;
+      const dataPoints = Math.round(3 + (endData.length - 3) * progress);
+      transitionData = fundingData.slice(0, Math.max(3, dataPoints));
+    } 
+    else if (scrollDirection === 'up' && chapterId === 'funding2022') {
+      // Transitioning from 2025 to 2022 (shrinking the graph)
+      const progress = 1 - graphTransition.progress;
+      const maxPoints = fundingData.slice(0, 9).length;
+      const dataPoints = Math.round(3 + (maxPoints - 3) * progress);
+      transitionData = fundingData.slice(0, Math.max(3, dataPoints));
+    }
+  }
+  
   // Set up scales
   const x = d3.scaleBand()
-    .domain(chapterData.map(d => d.year))
+    .domain(fundingData.map(d => d.year))
     .range([0, width])
     .padding(0.1);
   
+  // Calculate y domain based on visible series
+  const maxValue = d3.max(fundingData, d => {
+    let seriesMax = 0;
+    config.showSeries.forEach(series => {
+      if (d[series] > seriesMax) seriesMax = d[series];
+    });
+    return seriesMax;
+  });
+  
   const y = d3.scaleLinear()
-    .domain([0, d3.max(chapterData, d => Math.max(d.emergency, d.nonEmergency, d.floodRisk, d.bric)) * 1.1])
+    .domain([0, maxValue * 1.1])
     .nice()
     .range([height, 0]);
   
@@ -271,75 +337,65 @@ function updateTimelineGraph(chapterId) {
     .style('stroke', '#e0e0e0')
     .style('stroke-opacity', 0.7);
   
-  // Define line generators
-  const emergencyLine = d3.line()
-    .x(d => x(d.year) + x.bandwidth()/2)
-    .y(d => y(d.emergency));
+  // Create the hand-drawn scribble paths - MODIFIED LINE THICKNESS
+  function createScribbleLine(data, series, color, strokeWidth) {
+    // Filter out data if this series isn't shown in the current chapter
+    if (!config.showSeries.includes(series)) return;
+    
+    // Adjust thickness according to series type - MODIFIED as requested
+    let adjustedStrokeWidth = strokeWidth;
+    if (series === 'emergency' || series === 'floodRisk' || series === 'bric') {
+      adjustedStrokeWidth = strokeWidth * 2; // Double thickness for these series
+    }
+    
+    // Create points for the line
+    const points = data.map(d => [
+      x(d.year) + x.bandwidth()/2, 
+      y(d[series])
+    ]);
+    
+    // Generate the scribble path
+    const scribblePath = generateScribblePath(points, 2);
+    
+    // Add the path to the SVG
+    svg.append('path')
+      .attr('fill', 'none')
+      .attr('stroke', color)
+      .attr('stroke-width', adjustedStrokeWidth)
+      .attr('d', scribblePath)
+      .style('opacity', 1);
+    
+    // Add dots at each data point
+    svg.selectAll(`.dot-${series}`)
+      .data(data)
+      .enter()
+      .append('circle')
+      .attr('cx', d => x(d.year) + x.bandwidth()/2)
+      .attr('cy', d => y(d[series]))
+      .attr('r', adjustedStrokeWidth * 0.8)
+      .attr('fill', color);
+  }
   
-  const nonEmergencyLine = d3.line()
-    .x(d => x(d.year) + x.bandwidth()/2)
-    .y(d => y(d.nonEmergency));
+  // Create scribble lines for each data series with NYT colors - MODIFIED thickness values
+  createScribbleLine(transitionData, 'emergency', nytColors.emergency, 3);
+  createScribbleLine(transitionData, 'nonEmergency', nytColors.nonEmergency, 2);
+  createScribbleLine(transitionData, 'floodRisk', nytColors.floodRisk, 2);
+  createScribbleLine(transitionData, 'bric', nytColors.bric, 2);
   
-  const floodRiskLine = d3.line()
-    .x(d => x(d.year) + x.bandwidth()/2)
-    .y(d => y(d.floodRisk));
+  // Add legend with NYT colors
+  const legendData = [
+    { name: 'Emergency Climate Funding', series: 'emergency', color: nytColors.emergency },
+    { name: 'Non-Emergency Funding', series: 'nonEmergency', color: nytColors.nonEmergency },
+    { name: 'Flood Risk Funding', series: 'floodRisk', color: nytColors.floodRisk },
+    { name: 'FEMA BRIC Program', series: 'bric', color: nytColors.bric }
+  ].filter(item => config.showSeries.includes(item.series));
   
-  const bricLine = d3.line()
-    .x(d => x(d.year) + x.bandwidth()/2)
-    .y(d => y(d.bric));
-  
-  // Add lines with animation
-  svg.append('path')
-    .datum(chapterData)
-    .attr('fill', 'none')
-    .attr('stroke', '#e74c3c')
-    .attr('stroke-width', 3)
-    .attr('d', emergencyLine)
-    .style('opacity', 0)
-    .transition()
-    .duration(1000)
-    .style('opacity', 1);
-  
-  svg.append('path')
-    .datum(chapterData)
-    .attr('fill', 'none')
-    .attr('stroke', '#3498db')
-    .attr('stroke-width', 2)
-    .attr('d', nonEmergencyLine)
-    .style('opacity', 0)
-    .transition()
-    .duration(1000)
-    .style('opacity', 1);
-  
-  svg.append('path')
-    .datum(chapterData)
-    .attr('fill', 'none')
-    .attr('stroke', '#27ae60')
-    .attr('stroke-width', 2)
-    .attr('d', floodRiskLine)
-    .style('opacity', 0)
-    .transition()
-    .duration(1000)
-    .style('opacity', 1);
-  
-  svg.append('path')
-    .datum(chapterData)
-    .attr('fill', 'none')
-    .attr('stroke', '#8e44ad')
-    .attr('stroke-width', 2)
-    .attr('d', bricLine)
-    .style('opacity', 0)
-    .transition()
-    .duration(1000)
-    .style('opacity', 1);
-  
-  // Add legend
   const legend = svg.append('g')
     .attr('font-family', "'Gill Sans', 'Helvetica', sans-serif")
     .attr('font-size', 10)
     .attr('text-anchor', 'start')
     .selectAll('g')
-    .data(['Emergency Climate Funding', 'Non-Emergency Funding', 'Flood Risk Funding', 'FEMA BRIC Program'])
+    .data(legendData)
     .enter().append('g')
     .attr('transform', (d, i) => `translate(${width - 170},${i * 20})`);
   
@@ -347,78 +403,94 @@ function updateTimelineGraph(chapterId) {
     .attr('x', 0)
     .attr('width', 15)
     .attr('height', 15)
-    .attr('fill', (d, i) => ['#e74c3c', '#3498db', '#27ae60', '#8e44ad'][i]);
+    .attr('fill', d => d.color);
   
   legend.append('text')
     .attr('x', 20)
     .attr('y', 9.5)
     .attr('dy', '0.32em')
-    .text(d => d);
+    .text(d => d.name);
+  
+  // ADD TOP 5 EMERGENCY CLIMATE FUNDS LIST
+  const fundsListX = width - 210;
+  const fundsListY = height - 230; // Moved higher up to avoid overlap
+  
+  // Add header for the funds list with Justice40 reference
+  svg.append('text')
+    .attr('x', fundsListX)
+    .attr('y', fundsListY - 40)
+    .attr('font-family', "'Gill Sans', 'Helvetica', sans-serif")
+    .attr('font-size', 12)
+    .attr('font-weight', 'bold')
+    .text('TOP 5 FUNDS UNDER JUSTICE40 INITIATIVE');
+    
+  svg.append('text')
+    .attr('x', fundsListX)
+    .attr('y', fundsListY - 25)
+    .attr('font-family', "'Gill Sans', 'Helvetica', sans-serif")
+    .attr('font-size', 9)
+    .attr('font-style', 'italic')
+    .text('40% of benefits directed to disadvantaged communities');
+  
+  // Add funds list items
+  topEmergencyFunds.forEach((fund, i) => {
+    svg.append('text')
+      .attr('x', fundsListX)
+      .attr('y', fundsListY + (i * 16))
+      .attr('font-family', "'Gill Sans', 'Helvetica', sans-serif")
+      .attr('font-size', 10)
+      .text(`${fund.name}: ${fund.amount}`);
+  });
+  
+
+
+
   
   // Highlight the specified year
   if (config.highlightYear) {
-    const highlightedData = chapterData.find(d => d.year === config.highlightYear);
+    const highlightedData = transitionData.find(d => d.year === config.highlightYear);
     if (highlightedData) {
       const yearX = x(config.highlightYear) + x.bandwidth()/2;
       
       // Add vertical line at highlighted year
-      svg.append('line')
-        .attr('x1', yearX)
-        .attr('y1', 0)
-        .attr('x2', yearX)
-        .attr('y2', height)
+      svg.append('path')
+        .attr('d', `M${yearX},0 L${yearX},${height}`)
         .attr('stroke', '#555')
         .attr('stroke-width', 1.5)
         .attr('stroke-dasharray', '5,5')
-        .style('opacity', 0)
-        .transition()
-        .duration(1200)
         .style('opacity', 0.7);
-      
-      // Add highlights for each data point
-      const dataPoints = [
-        { value: highlightedData.emergency, color: '#e74c3c' },
-        { value: highlightedData.nonEmergency, color: '#3498db' },
-        { value: highlightedData.floodRisk, color: '#27ae60' },
-        { value: highlightedData.bric, color: '#8e44ad' }
-      ];
-      
-      dataPoints.forEach(point => {
-        svg.append('circle')
-          .attr('cx', yearX)
-          .attr('cy', y(point.value))
-          .attr('r', 0)
-          .attr('fill', point.color)
-          .transition()
-          .duration(1500)
-          .attr('r', 6);
-      });
-      
-      // Add value for highlighted emergency funding
-      svg.append('text')
-        .attr('x', yearX + 10)
-        .attr('y', y(highlightedData.emergency) - 10)
-        .attr('fill', '#e74c3c')
-        .attr('font-weight', 'bold')
-        .style('font-size', '0.9rem')
-        .style('font-family', "'Gill Sans', 'Helvetica', sans-serif")
-        .style('opacity', 0)
-        .text('$' + highlightedData.emergency + 'M')
-        .transition()
-        .duration(1500)
-        .style('opacity', 1);
     }
   }
   
-  // Add special visualization for the dramatic drop in 2025
-  if (chapterId === 'funding2025' || chapterId === 'funding2029') {
-    const q2Index = chapterData.findIndex(d => d.year === '2025 Q2');
-    const q3Index = chapterData.findIndex(d => d.year === '2025 Q3');
-    
-    if (q2Index !== -1 && q3Index !== -1) {
-      const q2Data = chapterData[q2Index];
-      const q3Data = chapterData[q3Index];
+  // Chapter-specific highlights
+  if (chapterId === 'funding2022') {
+    // Highlight 2022 peak
+    const year2022 = transitionData.find(d => d.year === '2022');
+    if (year2022) {
+      svg.append('circle')
+        .attr('cx', x('2022') + x.bandwidth()/2)
+        .attr('cy', y(year2022.emergency))
+        .attr('r', 8) // Increased size
+        .attr('fill', nytColors.emergency)
+        .attr('stroke', 'white')
+        .attr('stroke-width', 2);
       
+      svg.append('text')
+        .attr('x', x('2022') + x.bandwidth()/2 + 10)
+        .attr('y', y(year2022.emergency) - 10)
+        .attr('fill', nytColors.emergency)
+        .attr('font-weight', 'bold')
+        .style('font-size', '0.9rem')
+        .style('font-family', "'Gill Sans', 'Helvetica', sans-serif")
+        .text('$' + year2022.emergency + 'M');
+    }
+  } 
+  else if (chapterId === 'funding2025') {
+    // Show the dramatic drop in 2025
+    const q2Data = transitionData.find(d => d.year === '2025 Q2');
+    const q3Data = transitionData.find(d => d.year === '2025 Q3');
+    
+    if (q2Data && q3Data) {
       const q2X = x(q2Data.year) + x.bandwidth()/2;
       const q3X = x(q3Data.year) + x.bandwidth()/2;
       const q2Y = y(q2Data.emergency);
@@ -427,38 +499,183 @@ function updateTimelineGraph(chapterId) {
       // Calculate percentage drop
       const percentDrop = ((q2Data.emergency - q3Data.emergency) / q2Data.emergency * 100).toFixed(0);
       
-      // Draw annotation
+      // Draw annotation with scribble effect
+      const annotationPoints = [
+        [q2X, q2Y],
+        [q2X+15, q2Y-15],
+        [q3X-15, q3Y-15],
+        [q3X, q3Y]
+      ];
+      
       svg.append('path')
-        .attr('d', `M${q2X},${q2Y} L${q2X+15},${q2Y-15} L${q3X-15},${q3Y-15} L${q3X},${q3Y}`)
+        .attr('d', generateScribblePath(annotationPoints, 3))
         .attr('fill', 'none')
-        .attr('stroke', '#e74c3c')
-        .attr('stroke-width', 1.5)
-        .attr('stroke-dasharray', '3,3')
-        .style('opacity', 0)
-        .transition()
-        .delay(1500)
-        .duration(800)
-        .style('opacity', 1);
+        .attr('stroke', nytColors.emergency)
+        .attr('stroke-width', 2) // Increased thickness
+        .attr('stroke-dasharray', '3,3');
       
       // Add dramatic drop text
       svg.append('text')
         .attr('x', (q2X + q3X) / 2)
         .attr('y', ((q2Y + q3Y) / 2) - 25)
         .attr('text-anchor', 'middle')
-        .attr('fill', '#e74c3c')
+        .attr('fill', nytColors.emergency)
         .attr('font-weight', 'bold')
-        .style('font-size', '0.9rem')
+        .style('font-size', '1rem') // Increased size
         .style('font-family', "'Gill Sans', 'Helvetica', sans-serif")
-        .text(`${percentDrop}% drop`)
-        .style('opacity', 0)
-        .transition()
-        .delay(1800)
-        .duration(800)
-        .style('opacity', 1);
+        .text(`${percentDrop}% drop`);
+      
+      // Highlight Q4 value
+      const q4Data = transitionData.find(d => d.year === '2025 Q4');
+      if (q4Data) {
+        svg.append('circle')
+          .attr('cx', x('2025 Q4') + x.bandwidth()/2)
+          .attr('cy', y(q4Data.emergency))
+          .attr('r', 8) // Increased size
+          .attr('fill', nytColors.emergency)
+          .attr('stroke', 'white')
+          .attr('stroke-width', 2);
+        
+        svg.append('text')
+          .attr('x', x('2025 Q4') + x.bandwidth()/2 + 10)
+          .attr('y', y(q4Data.emergency) - 10)
+          .attr('fill', nytColors.emergency)
+          .attr('font-weight', 'bold')
+          .style('font-size', '0.9rem')
+          .style('font-family', "'Gill Sans', 'Helvetica', sans-serif")
+          .text('$' + q4Data.emergency + 'M');
+      }
+    }
+  }
+  else if (chapterId === 'floodFunding') {
+    // Highlight the dramatic drop in flood risk funding
+    const q1Data = transitionData.find(d => d.year === '2025 Q1');
+    const q3Data = transitionData.find(d => d.year === '2025 Q3');
+    
+    if (q1Data && q3Data) {
+      // Calculate percentage drops
+      const floodRiskDrop = ((q1Data.floodRisk - q3Data.floodRisk) / q1Data.floodRisk * 100).toFixed(0);
+      const bricDrop = 100; // BRIC dropped to 0
+      
+      // Highlight flood risk drop
+      const q1X = x(q1Data.year) + x.bandwidth()/2;
+      const q3X = x(q3Data.year) + x.bandwidth()/2;
+      const q1YFlood = y(q1Data.floodRisk);
+      const q3YFlood = y(q3Data.floodRisk);
+      
+      // Draw annotation with scribble effect for flood risk
+      const floodAnnotationPoints = [
+        [q1X, q1YFlood],
+        [q1X+15, q1YFlood-15],
+        [q3X-15, q3YFlood-15],
+        [q3X, q3YFlood]
+      ];
+      
+      svg.append('path')
+        .attr('d', generateScribblePath(floodAnnotationPoints, 3))
+        .attr('fill', 'none')
+        .attr('stroke', nytColors.floodRisk)
+        .attr('stroke-width', 2) // Increased thickness
+        .attr('stroke-dasharray', '3,3');
+      
+      // Add drop text for flood risk
+      svg.append('text')
+        .attr('x', (q1X + q3X) / 2)
+        .attr('y', ((q1YFlood + q3YFlood) / 2) - 25)
+        .attr('text-anchor', 'middle')
+        .attr('fill', nytColors.floodRisk)
+        .attr('font-weight', 'bold')
+        .style('font-size', '1rem') // Increased size
+        .style('font-family', "'Gill Sans', 'Helvetica', sans-serif")
+        .text(`${floodRiskDrop}% drop`);
+      
+      // Highlight BRIC program elimination
+      const q1YBric = y(q1Data.bric);
+      const q2Data = transitionData.find(d => d.year === '2025 Q2');
+      const q2X = x(q2Data.year) + x.bandwidth()/2;
+      const q2YBric = y(q2Data.bric);
+      
+      // Circle and text to highlight BRIC elimination
+      svg.append('circle')
+        .attr('cx', q2X)
+        .attr('cy', q2YBric)
+        .attr('r', 8) // Increased size
+        .attr('fill', nytColors.bric)
+        .attr('stroke', 'white')
+        .attr('stroke-width', 2);
+      
+      svg.append('text')
+        .attr('x', q2X + 10)
+        .attr('y', q2YBric - 10)
+        .attr('fill', nytColors.bric)
+        .attr('font-weight', 'bold')
+        .style('font-size', '1rem') // Increased size
+        .style('font-family', "'Gill Sans', 'Helvetica', sans-serif")
+        .text('Program eliminated');
+    }
+  }
+  
+  // Update the previous data reference
+  previousData = transitionData;
+}
+
+// Function to show the timeline graph - called from chapter callbacks
+function showTimelineGraph() {
+  if (!timelineGraphContainer) {
+    createTimelineGraph();
+    setTimeout(() => updateTimelineGraph(currentChapterId), 100);
+  } else {
+    // Start a transition effect if we're changing chapters
+    const prevChapter = currentTimelineChapter;
+    
+    if (prevChapter && prevChapter !== currentChapterId) {
+      graphTransition = {
+        active: true,
+        from: prevChapter,
+        to: currentChapterId,
+        progress: 0
+      };
+      
+      // Animated transition over 1 second
+      let startTime = null;
+      const duration = 800; // ms
+      
+      function animateTransition(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const elapsed = timestamp - startTime;
+        
+        // Calculate progress (0 to 1)
+        graphTransition.progress = Math.min(elapsed / duration, 1);
+        
+        // Update the graph with transition data
+        timelineGraphContainer.style.opacity = '1';
+        updateTimelineGraph(currentChapterId);
+        
+        // Continue animation if not complete
+        if (graphTransition.progress < 1) {
+          requestAnimationFrame(animateTransition);
+        } else {
+          // Finish transition
+          graphTransition.active = false;
+        }
+      }
+      
+      // Start the animation
+      requestAnimationFrame(animateTransition);
+    } else {
+      // No transition needed
+      timelineGraphContainer.style.opacity = '1';
+      updateTimelineGraph(currentChapterId);
     }
   }
 }
 
+// Function to hide the timeline graph
+function hideTimelineGraph() {
+  if (timelineGraphContainer) {
+    timelineGraphContainer.style.opacity = '0';
+  }
+}
 
 //JUSTICE 40MAP
 // Add this to your map.js file
@@ -480,74 +697,25 @@ function hideJustice40Map() {
   map.setPaintProperty('justice40-outline', 'line-opacity', 0);
 }
 
-// Function to show the timeline graph - called from chapter callbacks
-function showTimelineGraph() {
-  if (!timelineGraphContainer) {
-    createTimelineGraph();
-    setTimeout(() => updateTimelineGraph(currentChapterId), 100);
-  } else {
-    updateTimelineGraph(currentChapterId);
-  }
-}
 
-// Function to hide the timeline graph
-function hideTimelineGraph() {
-  if (timelineGraphContainer) {
-    timelineGraphContainer.style.opacity = '0';
-  }
-}
+// // Add the cloudburst transition functions
+// function fadeInCloudburstImage() {
+//   console.log("Fading in cloudburst image");
+//   const overlay = document.getElementById('cloudburstOverlay');
+//   if (overlay) {
+//     overlay.style.opacity = "1";
+//   }
+// }
 
-// Add the cloudburst transition functions
-function fadeInCloudburstImage() {
-  console.log("Fading in cloudburst image");
-  const overlay = document.getElementById('cloudburstOverlay');
-  if (overlay) {
-    overlay.style.opacity = "1";
-  }
-}
+// function fadeOutCloudburstImage() {
+//   console.log("Fading out cloudburst image");
+//   const overlay = document.getElementById('cloudburstOverlay');
+//   if (overlay) {
+//     overlay.style.opacity = "0";
+//   }
+// }
 
-function fadeOutCloudburstImage() {
-  console.log("Fading out cloudburst image");
-  const overlay = document.getElementById('cloudburstOverlay');
-  if (overlay) {
-    overlay.style.opacity = "0";
-  }
-}
 
-// Add the Queens video playback function
-function setupQueensVideoPlayback() {
-  // Get the chapter element
-  const videoChapter = document.getElementById("QUEENS_VIDEO");
-  
-  // Add an intersection observer to detect when the video chapter is visible
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      const videoElement = document.getElementById("queensVideo");
-      if (!videoElement) return;
-      
-      if (entry.isIntersecting) {
-        // Play the video when chapter becomes visible
-        videoElement.play().catch(e => console.error("Video play error:", e));
-      } else {
-        // Optionally pause the video when not visible
-        // videoElement.pause();
-      }
-    });
-  }, { threshold: 0.3 }); // Trigger when 30% of the element is visible
-  
-  // Start observing the video chapter when it exists in the DOM
-  if (videoChapter) {
-    observer.observe(videoChapter);
-  } else {
-    // If the chapter doesn't exist yet, check again after a short delay
-    setTimeout(() => {
-      const videoChapterDelayed = document.getElementById("QUEENS_VIDEO");
-      if (videoChapterDelayed) {
-        observer.observe(videoChapterDelayed);
-      }
-    }, 2000);
-  }
-}
 
 /* Here we add the two extra layers we are using, just like in our previous
 tutorial. At the end, however, we setup the functions that will tie the
@@ -980,52 +1148,6 @@ function showPointData() {
   map.setPaintProperty('311', 'circle-opacity', 0.7);
   map.setPaintProperty('311', 'circle-stroke-opacity', 0.5);
   map.setPaintProperty('311-labels', 'text-opacity', 0.7);
-}
-
-
-//queens VIDEO
-function initQueensVideo() {
-  const video = document.getElementById('queensVideo');
-  
-  // Most browsers require a user interaction before allowing autoplay with sound
-  // This is a workaround to try to play with sound when the chapter is activated
-  video.muted = false; // Ensure audio is not muted
-  
-  // Try to play the video
-  const playPromise = video.play();
-  
-  // Handle potential autoplay restrictions
-  if (playPromise !== undefined) {
-    playPromise.then(() => {
-      // Playback started successfully with audio
-      console.log("Video playing with audio");
-    }).catch(error => {
-      // Autoplay with audio was prevented by the browser
-      console.log("Autoplay with audio prevented by browser:", error);
-      
-      // Fallback: try to play muted (most browsers allow this)
-      video.muted = true;
-      video.play().then(() => {
-        // Add a button to unmute
-        const unmuteBtn = document.createElement('button');
-        unmuteBtn.innerText = "🔊 Tap for Sound";
-        unmuteBtn.style.position = "absolute";
-        unmuteBtn.style.bottom = "20px";
-        unmuteBtn.style.right = "20px";
-        unmuteBtn.style.padding = "10px";
-        unmuteBtn.style.backgroundColor = "rgba(0,0,0,0.5)";
-        unmuteBtn.style.color = "white";
-        unmuteBtn.style.border = "none";
-        unmuteBtn.style.borderRadius = "5px";
-        unmuteBtn.style.cursor = "pointer";
-        unmuteBtn.onclick = function() {
-          video.muted = false;
-          this.remove();
-        };
-        video.parentNode.appendChild(unmuteBtn);
-      });
-    });
-  }
 }
 
 // Setup the instance of scrollama

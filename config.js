@@ -119,6 +119,18 @@ let divChapterCloudburstDetails =
     '<img src="Images/Cloudburst Section Positive.png" style="display: block; width: 100vw; height: auto; margin: 0; padding: 0;">' +
   '</div>';
   
+  chapterDiv: '<div style="position: relative; width: 100%; height: 100vh; overflow: hidden;">' +
+  '<video id="queensVideo" muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">' +
+  '<source src="Images/Queens.mp4" type="video/mp4">' +
+  'Your browser does not support the video tag.' +
+  '</video>' +
+  '<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3);"></div>' +
+  '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">' +
+  '<h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Climate Justice for Queens</h2>' +
+  '<p style="font-size: 1.2rem; max-width: 600px;">Without federal funding, these communities will continue to face increasing flood risks.</p>' +
+  '</div>' +
+  '</div>'
+  // iframe
   
 
 
@@ -174,18 +186,7 @@ var config = {
           duration: 0
         }
       ],
-      onChapterExit: [
-        {
-          layer: "311",
-          opacity: 0,
-          duration: 0
-        },
-        {
-          layer: "311-labels",
-          opacity: 0,
-          duration: 0
-        }
-      ]
+      onChapterExit: [      ]
     },
     //311 DATA ZOOMED IN
     {
@@ -342,10 +343,10 @@ var config = {
       exitCallback: "hideTimelineGraph"
     },
     {
-      id: "funding2029",
-      alignment: "full", 
+      id: "floodFunding",
+      alignment: "full",
       hidden: false,
-      chapterDiv: divChapterFunding2029,
+      chapterDiv: divChapter1,
       location: {
         center: [-73.92, 40.749],
         zoom: 10,
@@ -359,6 +360,8 @@ var config = {
       onChapterExit: [],
       exitCallback: "hideTimelineGraph"
     },
+ 
+
   
 //EJAREAS JUSTICE40
 {
@@ -576,7 +579,7 @@ var config = {
         }
       ]
     },
-    // Add this to your chapters array in map.js
+    // VIDEO IF IT WORKS 
 {
   id: "queens_video_chapter",
   alignment: "full",
@@ -595,17 +598,6 @@ var config = {
   callback: "initQueensVideo",
   onChapterEnter: [],
   onChapterExit: [],
-  chapterDiv: '<div style="position: relative; width: 100%; height: 100vh; overflow: hidden;">' +
-    '<video id="queensVideo" muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;">' +
-    '<source src="Images/Queens.mp4" type="video/mp4">' +
-    'Your browser does not support the video tag.' +
-    '</video>' +
-    '<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.3);"></div>' +
-    '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white;">' +
-    '<h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Climate Justice for Queens</h2>' +
-    '<p style="font-size: 1.2rem; max-width: 600px;">Without federal funding, these communities will continue to face increasing flood risks.</p>' +
-    '</div>' +
-    '</div>'
 }
   ]
 };
