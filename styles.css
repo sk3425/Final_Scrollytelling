@@ -42,7 +42,7 @@ body {
   pointer-events: none; /* Let user still scroll normally */
   transition: opacity 2s ease;
   z-index: 10; /* Higher than the map */
-  background: rgba(0, 0, 0, 0); /* transparent background */
+  background: rgba(0, 0, 0, 0) !important; /* transparent background */
 }
 
 
@@ -135,7 +135,7 @@ body {
   }
   #features .imageCredit {
     font-size: 0.9em;
-    margin-top: -5px;
+    margin-top: 0px;
   }
   #footer p {
     font-family: "Roboto Condensed", sans-serif;
@@ -145,7 +145,11 @@ body {
     margin: 0px auto;
   }
 
-
+  #img {
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+  }
 
   
   a,
@@ -192,14 +196,15 @@ body {
     padding: 25px 50px;
     line-height: 25px;
     font-size: 13px;
+    background-color: rgba(255, 255, 255, 0.7); /* white with 70% opacity */
   }
+  
   .step img {
     width: 100%;
   }
   .graph-container {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
   }
   
   @media (max-width: 750px) {
