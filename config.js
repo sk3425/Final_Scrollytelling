@@ -5,7 +5,7 @@ let bylineDiv = "";
 // Define footerDiv since it's referenced in the config
 let footerDiv = "";
 
-// Put all content in the descriptionDiv with white text and a more reliable method to display delayed text
+// OPENING VIDEO PAGE
 let descriptionDiv =
   '<div class="intro-section" style="position: relative; width: 100vw; height: 100vh; overflow: hidden; margin: 0; padding: 0;">' +
     '<video class="intro-video" autoplay muted loop playsinline style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1;"><source src="Images/basement flood.mp4" type="video/mp4">Your browser does not support the video tag.</video>' +
@@ -28,7 +28,6 @@ let descriptionDiv =
     'body, html { margin: 0 !important; padding: 0 !important; overflow-x: hidden; }' +
     '#header { margin: 0 !important; padding: 0 !important; }' +
     '.header { margin: 0 !important; padding: 0 !important; }' +
-    // Add this inline animation for text appearance that doesn't rely on JavaScript execution
     '#delayed-text { animation: fadeIn 1s ease 5s forwards; opacity: 0; }' +
     '@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }' +
   '</style>';
@@ -38,90 +37,39 @@ let divChapter1 =
   "<h3>311 COMPLAINTS</h3>" +
   "<p>311 complaints about flooding in NYC show patterns of street flooding reports across the city, with particular concentration in certain areas of Queens.</p>";
 
-// 311 DATA ZOOMED IN 
-// Update the divChapter2 content to include audio clips with the correct file paths
-
+// 311 DATA ZOOMED IN WITH ALIGNED AUDIO PLAYERS
 let divChapter2 = 
-  "<h3>NYC Flooding Reports</h3>" +
+  "<h3>NYC FLOODING REPORTS</h3>" +
   "<p>311 reports of street flooding across NYC, zoomed in to show detail in affected neighborhoods.</p>" +
-  "<div class='audio-container' style='margin-top: 10px; display: flex; gap: 8px;'>" +
-    
-    // Just tiny play buttons without text or background
-    "<button class='play-button' data-audio-id='audio1' data-title='Flooded Cars' style='background-color: #3FB1CE; color: white; width: 16px; height: 16px; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; padding: 0; font-size: 8px; box-shadow: none;'>▶</button>" +
-    
-    "<button class='play-button' data-audio-id='audio2' data-title='Entire Roadway Flooded' style='background-color: #3FB1CE; color: white; width: 16px; height: 16px; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; padding: 0; font-size: 8px; box-shadow: none;'>▶</button>" +
-    
-    "<button class='play-button' data-audio-id='audio3' data-title='Water Up To My Knee' style='background-color: #3FB1CE; color: white; width: 16px; height: 16px; border-radius: 50%; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; padding: 0; font-size: 8px; box-shadow: none;'>▶</button>" +
-  "</div>" +
   
-  // Audio elements (hidden)
-  "<audio id='audio1' src='Images/1FloodedCars.mp3' preload='none'></audio>" +
-  "<audio id='audio2' src='Images/2ThisEntireRoadwayWasFlooded.mp3' preload='none'></audio>" +
-  "<audio id='audio3' src='Images/3WaterUpToMyKnee.mp3' preload='none'></audio>" +
-  
-  // Add JavaScript to handle audio playback - simplified for tiny buttons
-  "<script>" +
-    "document.addEventListener('DOMContentLoaded', function() {" +
-      "let currentlyPlaying = null;" +
-      "let buttons = document.querySelectorAll('.play-button');" +
-      
-      "// Add tooltip functionality for tiny icons" +
-      "buttons.forEach(button => {" +
-        "button.setAttribute('title', button.getAttribute('data-title'));" +
-      "});" +
-      
-      "// Add click listeners to all buttons" +
-      "buttons.forEach(button => {" +
-        "button.addEventListener('click', function() {" +
-          "const audioId = this.getAttribute('data-audio-id');" +
-          "const audio = document.getElementById(audioId);" +
-          
-          "if (!audio) {" +
-            "console.error('Audio element not found:', audioId);" +
-            "return;" +
-          "}" +
-          
-          "// If this audio is already playing, pause it" +
-          "if (currentlyPlaying === audio) {" +
-            "audio.pause();" +
-            "audio.currentTime = 0;" +
-            "this.innerHTML = '▶';" +
-            "currentlyPlaying = null;" +
-            "return;" +
-          "}" +
-          
-          "// Stop any currently playing audio" +
-          "if (currentlyPlaying) {" +
-            "currentlyPlaying.pause();" +
-            "currentlyPlaying.currentTime = 0;" +
-            "document.querySelector(`[data-audio-id='${currentlyPlaying.id}']`).innerHTML = '▶';" +
-          "}" +
-          
-          "// Force audio to load and play" +
-          "audio.load();" +
-          "const playPromise = audio.play();" +
-          
-          "if (playPromise !== undefined) {" +
-            "playPromise.then(_ => {" +
-              "// Playback started successfully" +
-              "this.innerHTML = '■';" +
-              "currentlyPlaying = audio;" +
-            "}).catch(error => {" +
-              "console.error('Playback failed:', error);" +
-              // Show alert about possible CORS or file path issues
-              "alert('Audio playback failed. Please check file paths and server permissions.');" +
-            "});" +
-          "}" +
-          
-          "// Reset button when audio ends" +
-          "audio.onended = function() {" +
-            "document.querySelector(`[data-audio-id='${audioId}']`).innerHTML = '▶';" +
-            "currentlyPlaying = null;" +
-          "};" +
-        "});" +
-      "});" +
-    "});" +
-  "</script>";
+  // Wrapper div with grid layout to ensure alignment
+  '<div style="display: grid; grid-template-columns: 200px 1fr; row-gap: 8px; align-items: center; margin: 0; padding: 0;">' +
+    
+    // First row - Flooded Cars
+    '<span style="color: #666; text-align: left;">Flooded Cars:</span>' +
+    '<audio controls style="height: 30px; margin: 0; padding: 0; background: transparent; outline: none; width: 100%;">' +
+      '<source src="./Images/1FloodedCars.mp3" type="audio/mpeg">' +
+    '</audio>' +
+    
+    // Second row - Entire Roadway Flooded
+    '<span style="color: #666; text-align: left;">Entire Roadway Flooded:</span>' +
+    '<audio controls style="height: 30px; margin: 0; padding: 0; background: transparent; outline: none; width: 100%;">' +
+      '<source src="./Images/2ThisEntireRoadwayWasFlooded.mp3" type="audio/mpeg">' +
+    '</audio>' +
+    
+    // Third row - Water Up To My Knee
+    '<span style="color: #666; text-align: left;">Water Up To My Knee:</span>' +
+    '<audio controls style="height: 30px; margin: 0; padding: 0; background: transparent; outline: none; width: 100%;">' +
+      '<source src="./Images/3WaterUpToMyKnee.mp3" type="audio/mpeg">' +
+    '</audio>' +
+    
+    // Fourth row - It's Like Life Stops
+    '<span style="color: #666; text-align: left;">It\'s Like Life Stops:</span>' +
+    '<audio controls style="height: 30px; margin: 0; padding: 0; background: transparent; outline: none; width: 100%;">' +
+      '<source src="./Images/4ItsLikeLifeStops.mp3" type="audio/mpeg">' +
+    '</audio>' +
+  '</div>';
+
 // FLOOD STREET LEVEL DATA
 let divChapterFloodingRisk = 
   "<h3>Flooding Risk Areas</h3>" +
@@ -151,6 +99,9 @@ let divChapterJustice1 =
 let divChapterJustice2 = 
   "<h3>ENVIRONMENTAL JUSTICE AREAS (JUSTICE40)</h3>" +
   '<img src="Images/justice 40.png" style="width: 100%; height: auto; border:none; box-shadow: none; display: block; margin: 0; padding: 0;">';
+
+ let divChapterJustice3 = 
+"<h3>ENVIRONMENTAL JUSTICE AREAS (JUSTICE40) IN NEW YORK</h3>" ;
 
 // REDLINED DISTRICTS
 let divChapter3 = 
@@ -529,7 +480,7 @@ var config = {
       id: "justice40-map",
       alignment: "full",
       hidden: false,
-      chapterDiv: "<h3>ENVIRONMENTAL JUSTICE AREAS (JUSTICE40)</h3>",
+      chapterDiv: divChapterJustice3,
       location: {
         center: [-73.856, 40.757],
         zoom: 10,
