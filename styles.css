@@ -18,20 +18,11 @@ body {
   width: 100% !important;
   height: 100vh !important;
   margin: 0;
-  background-color: rgba(255, 255, 255, 0.85) !important; /* Changed to slightly transparent */
+  background-color: rgba(255, 255, 255, 1) !important; /* Changed to slightly transparent */
   border-radius: 0; /* Removed border radius */
   padding: 0; /* Removed padding */
   box-shadow: none !important; /* Removed box shadow */
   overflow: visible; /* Ensure content isn't cut off */
-}
-
-/* Add specific styling for the timeline graph container */
-#timeline-graph-container {
-  background: transparent !important;
-}
-
-#timeline-svg-container {
-  background: transparent !important;
 }
 
 
@@ -167,26 +158,6 @@ a:visited {
   margin-right: auto !important;
 }
 
-/* Make ALL graph containers FULLY OPAQUE with WHITE backgrounds */
-#funding2022,
-#funding2025,
-#floodFunding,
-#timeline-graph-container,
-#graph-content,
-#timeline-svg-container,
-#timeline-svg-container svg,
-#timeline-title,
-#timeline-description {
-  background-color: white !important;
-  opacity: 1 !important; /* FULLY OPAQUE */
-  box-shadow: none !important;
-}
-
-/* Ensure SVG elements have white background */
-svg {
-  background-color: white !important;
-}
-
 
 
 /* SPECIFIC FIX FOR CLOUDBURST IMAGES - Only show in their respective chapters */
@@ -258,21 +229,7 @@ svg {
   opacity: 1 !important; /* Make fully opaque */
 }
 
-/* Make sure all graph elements are fully opaque */
-#timeline-graph-container path,
-#timeline-graph-container circle,
-#timeline-graph-container text,
-#timeline-graph-container line,
-#timeline-graph-container rect {
-  opacity: 1 !important;
-}
 
-/* Full width content container */
-.fully div {
-  width: 70vw !important;
-  max-width: 70vw !important;
-  margin: 0 auto;
-}
 
 /* Special styling for justice40 images */
 #justice40-before img,
