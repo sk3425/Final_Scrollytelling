@@ -912,7 +912,25 @@ scrolling to the chapters and move the map from one location to another
 while changing the zoom level, pitch and bearing */
 map.on("load", function () {
   // Create cloudburst overlay for later use
-  createCloudburstOverlay();
+  const zoomReveal = v => ['interpolate', ['linear'], ['zoom'], 11, 0, 13, v];
+
+  // 1) Rain needs to end with `});`
+  map.setRain({
+    density:            zoomReveal(0.5),
+    intensity:          1.0,
+    color:              '#a8adbc',
+    opacity:            0.7,
+    vignette:           zoomReveal(1.0),
+    'vignette-color':   '#464646',
+    direction:          [0, 80],
+    'droplet-size':     [2.6, 18.2],
+    'distortion-strength': 0.7,
+    'center-thinning':    0
+    // ← semicolon to close the statement
+  });
+
+  
+createCloudburstOverlay();
 
   if (config.use3dTerrain) {
     map.addSource("mapbox-dem", {
@@ -922,9 +940,14 @@ map.on("load", function () {
       maxzoom: 14,
     });
     // add the DEM source as a terrain layer with exaggerated height
+    
     map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
+    const rainLayer = new RainLayer({
+      id: 'rain',
+      source: 'rainviewer',
+      scale: 'noaa'
+  });
 
-    // add a sky layer that will show when the map is highly pitched
     map.addLayer({
       id: "sky",
       type: "sky",
@@ -945,10 +968,10 @@ map.on("load", function () {
       'data': 'Data/Flooding.geojson'
     },
     'paint': {
-      'circle-color': '#0066aa',       // Darker blue fill
+      'circle-color': '#e96138',       // Darker blue fill
       'circle-opacity': 0,           // 70% opacity for fill
       'circle-stroke-color': '#003366', // Much darker blue border
-      'circle-stroke-width': 1.5,        // 4 times thicker (from 1.5 to 6)
+      'circle-stroke-width': 0,        // 4 times thicker (from 1.5 to 6)
       'circle-stroke-opacity': 0,    // 50% opacity for border
       'circle-radius': [
         'interpolate', ['linear'], ['zoom'],
@@ -1026,7 +1049,7 @@ map.on("load", function () {
       'data': 'Data/Clipped gs.geojson'
     },
     'paint': {
-      'fill-color': '#0066aa',      // Darker blue fill (#0066aa)
+      'fill-color': '#768098',      // Darker blue fill (#0066aa)
       'fill-opacity': 0             // Start invisible
     }
   });
@@ -1039,7 +1062,7 @@ map.on("load", function () {
       'data': 'Data/Clipped gs.geojson'
     },
     'paint': {
-      'line-color': '#003366',      // Darker blue outline (#003366)
+      'line-color': '#768098',      // Darker blue outline (#003366)
       'line-width': 2,              // Slightly thicker line
       'line-opacity': 0             // Start invisible
     }
@@ -1054,7 +1077,7 @@ map.on("load", function () {
       'data': 'Data/Fema.geojson'
     },
     'paint': {
-      'fill-color': '#0066aa',      // Darker blue fill (#0066aa)
+      'fill-color': '#768098',      // Darker blue fill (#0066aa)
       'fill-opacity': 0             // Start invisible
     }
   });
@@ -1067,155 +1090,128 @@ map.on("load", function () {
       'data': 'Data/Fema.geojson'
     },
     'paint': {
-      'line-color': '#003366',      // Darker blue outline (#003366)
+      'line-color': '#768098',      // Darker blue outline (#003366)
       'line-width': 0,              // Slightly thicker line
       'line-opacity': 0             // Start invisible
     }
   });
 
-  // REDLINE
-  map.addLayer({
-    id: "redline",
-    type: "fill",
-    source: {
-      type: "geojson",
-      data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
-    },
-    paint: {
-      "fill-opacity": 0,  // Start invisible
-      "fill-color": [
-        "step",
-        ["get", "Redline"],
-        "rgba(0, 0, 0, 0)",  // transparent for lower values
-        60, "#bc8f8f",     // rosy brown for values 60-79.9
-        80, "#8b4513",     // saddle brown for values 80-89.9
-        90, "#5c3317"      // very dark brown for values 90-100
-      ]
-    }
-  }, 'water');
+  // 1) Population in Disadvantaged Communities — light cream-beige ramp
+map.addLayer({
+  id: "DAC",
+  type: "fill",
+  source: {
+    type: "geojson",
+    data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
+  },
+  paint: {
+    "fill-opacity": 0,
+    "fill-color": [
+      "step",
+      ["get", "Comb_Sc"],
+      "rgba(0,0,0,0)",  // <85
+      85, "#F9F6EF",    // very pale cream-beige
+      90, "#D8CFC7",    // soft taupe
+      95, "#BDB2A7"     // warm greige
+    ]
+  }
+}, 'water');
 
-  // Combined Race/Ethnicity Layer
-  map.addLayer({
-    id: "race-ethnicity",
-    type: "fill",
-    source: {
-      type: "geojson",
-      data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
-    },
-    paint: {
-      "fill-opacity": 0,  // Start invisible
-      "fill-color": [
-        "case",
-        // Asian predominant
-        [">", ["get", "Asian_Pct"], 
-          ["max", ["get", "Black_Pct"], ["get", "Lat_Pct"]]
-        ],
-        [
-          "step",
-          ["get", "Asian_Pct"],
-          "#e0ecf4", // light blue - lower percentage
-          50, "#9ebcda",
-          75, "#8c96c6",
-          90, "#8856a7"  // purple - highest percentage
-        ],
-        
-        // Black predominant
-        [">", ["get", "Black_Pct"], ["get", "Lat_Pct"]],
-        [
-          "step",
-          ["get", "Black_Pct"],
-          "#fee6ce", // light orange - lower percentage
-          50, "#fdae6b",
-          75, "#fd8d3c",
-          90, "#e6550d"  // dark orange - highest percentage
-        ],
-        
-        // Latino predominant (default)
-        [
-          "step",
-          ["get", "Lat_Pct"],
-          "#e5f5e0", // light green - lower percentage
-          50, "#a1d99b",
-          75, "#74c476",
-          90, "#41ab5d"  // dark green - highest percentage
-        ]
-      ]
-    }
-  }, 'water');
+// 2) Redlined Areas — blush-rose ramp
+map.addLayer({
+  id: "redline",
+  type: "fill",
+  source: {
+    type: "geojson",
+    data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
+  },
+  paint: {
+    "fill-opacity": 0,
+    "fill-color": [
+      "step",
+      ["get", "Redline"],
+      "rgba(0,0,0,0)",  // <60
+      60, "#F4C6C9",    // light blush
+      80, "#E7A2A5",    // medium blush
+      90, "#D9878A"     // deep rose
+    ]
+  }
+}, 'water');
 
-  // DISADVANTAGED COMMUNITIES
-  map.addLayer({
-    id: "DAC",
-    type: "fill",
-    source: {
-      type: "geojson",
-      data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson",
-    },
-    paint: {
-      "fill-opacity": 0,  // Start invisible
-      "fill-color": [
-        "step",
-        ["get", "Comb_Sc"],
-        "#ffffff",
-        85, "#ccedf5",
-        90, "#99daea",
-        95, "#66c7e0",
-        100, "#33b5d5",
-        105, "#00a2ca"
-      ],
-    },
-  });
-  
-  // LOW AMI
-  map.addLayer({
-    id: "verylowincome",
-    type: "fill",
-    source: {
-      type: "geojson",
-      data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
-    },
-    paint: {
-      "fill-opacity": 0,  // Start invisible
-      "fill-color": [
-        "step",
-        ["get", "LMI_80_AMI"],
-        "#ffffff",   // < 60: low share of low-income residents
-        60, "#e0ecf4",
-        70, "#9ebcda",
-        80, "#8c96c6",
-        90, "#8856a7",
-        95, "#810f7c"
-      ]
-    }
-  }, 'water');
+// 3) Race/Ethnicity — grey-olive monochrome with stronger contrast
+map.addLayer({
+  id: "race-ethnicity",
+  type: "fill",
+  source: {
+    type: "geojson",
+    data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
+  },
+  paint: {
+    "fill-opacity": 0,
+    "fill-color": [
+      "step",
+      ["max", ["get","Asian_Pct"], ["get","Black_Pct"], ["get","Lat_Pct"]],
+      "rgba(0,0,0,0)", // <50%
+      50, "#ECEED0",   // very pale olive
+      75, "#A7AE6E",   // base olive
+      90, "#6C703C",   // deep olive
+      100, "#3D3F24"   // nearly black-olive
+    ]
+  }
+}, 'water');
 
-  // Justice40 layer
-  map.addLayer({
-    id: "justice40-layer",
-    type: "fill",
-    source: {
-      type: "geojson",
-      data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
-    },
-    paint: {
-      "fill-opacity": 0,  // Start invisible
-      "fill-color": "#ff5500"  // Orange color for Justice40 areas
-    }
-  }, 'water');
+// 4) Low-to-Moderate Income Areas — neutral greys ramp
+map.addLayer({
+  id: "verylowincome",
+  type: "fill",
+  source: {
+    type: "geojson",
+    data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
+  },
+  paint: {
+    "fill-opacity": 0,
+    "fill-color": [
+      "step",
+      ["get", "LMI_80_AMI"],
+      "#F0F0F0", // <60%
+      60, "#D9D9D9",
+      70, "#B3B3B3",
+      80, "#8C8C8C",
+      90, "#666666",
+      95, "#333333"
+    ]
+  }
+}, 'water');
 
-  map.addLayer({
-    id: "justice40-outline",
-    type: "line",
-    source: {
-      type: "geojson",
-      data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
-    },
-    paint: {
-      "line-color": "#cc4400",  // Darker orange for outlines
-      "line-width": 1,
-      "line-opacity": 0  // Start invisible
-    }
-  }, 'water');
+// 5) Justice40 Areas — dusty rose accent (#a15f56)
+map.addLayer({
+  id: "justice40-layer",
+  type: "fill",
+  source: {
+    type: "geojson",
+    data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
+  },
+  paint: {
+    "fill-opacity": 0,
+    "fill-color": "#a15f56"
+  }
+}, 'water');
+
+map.addLayer({
+  id: "justice40-outline",
+  type: "line",
+  source: {
+    type: "geojson",
+    data: "Data/NYS_Disadvantaged_Communities_(DAC).geojson"
+  },
+  paint: {
+    "line-color": "#754540",
+    "line-width": 1,
+    "line-opacity": 0
+  }
+}, 'water');
+
+
 
 
   // Setup the scrollama instance
